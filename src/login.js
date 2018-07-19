@@ -1,5 +1,5 @@
 import React from 'react'
-import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, } from '@material-ui/core';
+import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, withStyles, } from '@material-ui/core';
 
 const styles = theme => ({
     loginDiv: {
@@ -12,18 +12,14 @@ const styles = theme => ({
 
     },
 })
-export default class LoginDialog extends React.Component {
-    state = {
-        open: true
-    }
-    render() {
-        return (
+const LoginDialog = (props) => {  
+    return (
             <div className={styles.div}>
                 <Dialog
-                    open={this.state.open}
-                    onClose = {this.handleClose}
+                    open={props.state.loginDialog}
                     disableBackdropClick
-                    disableEscapeKeyDown>
+                    disableEscapeKeyDown
+                    onClose = {props.handleLoginDialogClose}>
                     <DialogTitle id="form-dialog-title">Login</DialogTitle>
                     <DialogContent>
                         <DialogContentText> 
@@ -38,6 +34,7 @@ export default class LoginDialog extends React.Component {
                             helperText='Insira seu Login'
                             fullWidth
                             margin='dense'
+                            onChange = {props.handleLoginChange}
                         />
                         <TextField
                             required
@@ -48,17 +45,18 @@ export default class LoginDialog extends React.Component {
                             helperText='Insira Sua Senha'
                             fullWidth
                             margin='dense'
+                            onChange={props.handleSenhaChange}
                         />
                     </DialogContent>
                     <DialogActions> 
-                        <Button onClick={this.handleClickLogin} color='primary'>Entrar</Button>
-                        <Button onClick={this.handleClickCadastro} color='primary'>Cadastre-se</Button>
+                        <Button onClick={props.handleClickLogin} color='primary'>Entrar</Button>
+                        <Button onClick={props.handleClickCadastro} color='primary'>Cadastre-se</Button>
                     </DialogActions>
                 </Dialog>
             </div>
         )
     }
-}
 
 
 
+export default withStyles(styles)(LoginDialog)

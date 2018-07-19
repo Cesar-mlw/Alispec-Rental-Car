@@ -21,4 +21,5 @@ yarn-debug.log*
 yarn-error.log*
 
 /todo 
-/src/s10.jpg
+/src/images
+/src/cloudinary.js
