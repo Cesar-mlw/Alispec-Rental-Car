@@ -23,7 +23,7 @@ const LoginDialog = (props) => {
                     <DialogTitle id="form-dialog-title">Login</DialogTitle>
                     <DialogContent>
                         <DialogContentText> 
-                            Seja Bem vindo ao RentalSpec! Por favor efetue seu Login antes de continuar
+                            Seja Bem vindo ao RentalSpec! Por favor efetue seu Login antes de continuar.
                         </DialogContentText>
                         <TextField
                             required

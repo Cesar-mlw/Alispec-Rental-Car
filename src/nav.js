@@ -5,6 +5,8 @@ import { DirectionsCar, Receipt } from '@material-ui/icons'
 import 'typeface-roboto'
 import Login from './login'
 import Cloudinary from 'cloudinary'
+import Rental from './rental'
+import car from './car';
 
 const carArray = {
     "cars": [
@@ -43,8 +45,15 @@ export default class Nav extends React.Component {
         senha: '',
         loginDialog: false, //CHANGE THIS TO TRUE BEFORE SHIPPING IT OUT
         //states that control the user login
-        imageUrl: '',
-        //control image pointing for sendCar method
+        rentalDialog: false,
+        email: '',
+        duracao: '',
+        inicio: '',
+        termino: '',
+        carId: null,
+        carName: '',
+        activeStep: 0
+        //States that constrol the registry of rentals
     };
     handleChange = (event, value) => {
         this.setState({ value })
@@ -76,17 +85,48 @@ export default class Nav extends React.Component {
         let components = []
         for (let i in data.cars) {
             let image = data.cars[i].image
-            components[i] = (<Grid item key={i}><Car name={data.cars[i].name} desc={data.cars[i].desc} key={i} image={Cloudinary.url(image)} /></Grid>)
+            components[i] = (<Grid item key={i}><Car
+                handleRentalDialogOpen={this.handleRentDialogOpen}
+                state={this.state} name={data.cars[i].name}
+                desc={data.cars[i].desc} key={i} carId={i}
+                image={Cloudinary.url(image)}/></Grid>)
         }
         return components
     }
     //Car Card Handler
+    handleRentDialogOpen = (number, name) => {
+        this.setState({ rentalDialog: true , carId: number, carName: name})
+    }
+    handleRentDialogClose = () => {
+        this.setState({ rentalDialog: false })
+    }
+    handleRentalInicioChange = (event) => {
+        this.setState({inicio: event.target.value})
+    }
+    handleRentalTerminoChange = (event) => {
+        this.setState({termino: event.target.value})
+    }
+    handleRentalDuracaoChange = (event) => {
+        this.setState({duracao: event.target.value})
+    }
+    handleRentalBack = () => {
+        const { activeStep } = this.state
+        this.setState({activeStep: activeStep - 1})
+    }
+    handleRentalNext = () => {
+        console.log('Working');
+        const { activeStep } = this.state
+        this.setState({activeStep: activeStep + 1})
+    }
+    handleClickRental = () => {
+        this.setState({rentalDialog: false ,activeStep: 0})
+        alert("You Rented!")
+    }
     render() {
         const { value } = this.state
 
         return (
             <div className={styles.root} style={{ paddingTop: 56 }} >
-                {!this.state.auth && <Login state={this.state} handleClickCadastro={this.handleClickCadastro} handleClickLogin={this.handleClickLogin} handleLoginChange={this.handleLoginChange} handleSenhaChange={this.handleSenhaChange} handleLoginDialogClose={this.handleLoginDialogClose} />}
                 <AppBar position='fixed'>
                     <Toolbar>
                         <Typography variant='title' className={styles.titulo} color='inherit'>
@@ -113,8 +153,34 @@ export default class Nav extends React.Component {
                             </Grid>
                         </Grid>
                     </Grid>
-                /*TORNAR RESPONSIVO*/}
+                }
                 {value === 1 && <React.Fragment>Hellos</React.Fragment>}
+                {/*TABS*/}
+                {!this.state.auth && <Login state={this.state}
+                    handleClickCadastro={this.handleClickCadastro}
+                    handleClickLogin={this.handleClickLogin}
+                    handleLoginChange={this.handleLoginChange}
+                    handleSenhaChange={this.handleSenhaChange}
+                    handleLoginDialogClose={this.handleLoginDialogClose} />}
+                {/*LOGIN*/}
+                {this.state.rentalDialog && <Rental
+                    rentalDialog={this.state.rentalDialog} 
+                    email={this.state.email}
+                    duracao={this.state.duracao}
+                    inicio={this.state.inicio}
+                    termino={this.state.termino}
+                    carId={this.state.carId}
+                    carName={this.state.carName}
+                    activeStep={this.state.activeStep}
+                    handleRentalDialogClose = {this.handleRentDialogClose}
+                    handleRentalInicioChange={this.handleRentalInicioChange}
+                    handleRentalTerminoChange={this.handleRentalTerminoChange}
+                    handleRentalDuracaoChange={this.handleRentalDuracaoChange}
+                    handleRentalNext={this.handleRentalNext}
+                    handleRentalBack={this.handleRentalBack}
+                    handleClickRental = {this.handleClickRental}
+                    />}
+                {/*RENTAL*/}
             </div>
         )
     }

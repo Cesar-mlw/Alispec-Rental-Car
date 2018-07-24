@@ -30,7 +30,7 @@ function CarCard(props) {
                         </Typography>
                     </CardContent>
                     <CardActions>
-                        <Button size="small" color="primary">
+                        <Button size="small" color="primary" onClick={() => props.handleRentalDialogOpen(props.carId, props.name)}>
                             Reservar
                         </Button>
                     </CardActions>
