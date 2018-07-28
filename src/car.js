@@ -1,6 +1,6 @@
 import React from 'react'
 import { Card, CardActions, CardContent, CardMedia, Button, Typography, withStyles } from '@material-ui/core';
-const styles= {
+const styles = {
     media: {
         height: 0,
         paddingTop: '56.35%'
