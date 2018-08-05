@@ -27,6 +27,9 @@ function CarCard(props) {
                         </Typography>
                         <Typography component='p'>
                             {props.desc}
+                            {<br/>}
+                            
+                            Ano:{' ' + props.ano}
                         </Typography>
                     </CardContent>
                     <CardActions>

@@ -28,13 +28,13 @@ const LoginDialog = (props) => {
                         <TextField
                             required
                             id='usuario'
-                            label='Usuário'
+                            label='E-mail'
+                            placeholder='fernando_pessoa@mail.com'
                             type='text'
                             className={styles.textField}
-                            helperText='Insira seu Login'
                             fullWidth
                             margin='dense'
-                            onChange = {props.handleLoginChange}
+                            onChange = {props.handleEmailChange}
                         />
                         <TextField
                             required
@@ -42,7 +42,6 @@ const LoginDialog = (props) => {
                             label='Senha'
                             type='password'
                             className={styles.textField}
-                            helperText='Insira Sua Senha'
                             fullWidth
                             margin='dense'
                             onChange={props.handleSenhaChange}
