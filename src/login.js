@@ -1,5 +1,5 @@
 import React from 'react'
-import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, withStyles, } from '@material-ui/core';
+import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, withStyles, Typography, } from '@material-ui/core';
 
 const styles = theme => ({
     loginDiv: {
@@ -12,49 +12,40 @@ const styles = theme => ({
 
     },
 })
-const LoginDialog = (props) => {  
+const LoginDialog = (props) => {
     return (
-            <div className={styles.div}>
-                <Dialog
-                    open={props.state.loginDialog}
-                    disableBackdropClick
-                    disableEscapeKeyDown
-                    onClose = {props.handleLoginDialogClose}>
-                    <DialogTitle id="form-dialog-title">Login</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText> 
-                            Seja Bem vindo ao RentalSpec! Por favor efetue seu Login antes de continuar.
+        <div className={styles.div}>
+            <Dialog
+                open={props.state.loginDialog}
+                disableBackdropClick
+                disableEscapeKeyDown
+                onClose={props.handleLoginDialogClose}
+                fullWidth>
+                <DialogTitle id="form-dialog-title">Login</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Seja Bem vindo ao RentalSpec!
                         </DialogContentText>
-                        <TextField
-                            required
-                            id='usuario'
-                            label='E-mail'
-                            placeholder='fernando_pessoa@mail.com'
-                            type='text'
-                            className={styles.textField}
-                            fullWidth
-                            margin='dense'
-                            onChange = {props.handleEmailChange}
-                        />
-                        <TextField
-                            required
-                            id='senha'
-                            label='Senha'
-                            type='password'
-                            className={styles.textField}
-                            fullWidth
-                            margin='dense'
-                            onChange={props.handleSenhaChange}
-                        />
-                    </DialogContent>
-                    <DialogActions> 
-                        <Button onClick={props.handleClickLogin} color='primary'>Entrar</Button>
-                        <Button onClick={props.handleClickCadastro} color='primary'>Cadastre-se</Button>
-                    </DialogActions>
-                </Dialog>
-            </div>
-        )
-    }
+                    <TextField
+                        required
+                        id='usuario'
+                        label='E-mail Corporativo'
+                        placeholder='fernando_pessoa@alispec.com.br'
+                        type='text'
+                        className={styles.textField}
+                        fullWidth
+                        margin='dense'
+                        onChange={props.handleEmailChange}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={props.handleClickLogin} color='primary'>Entrar</Button>
+                    <Button onClick={props.handleClickCadastro} color='primary'>Cadastre-se</Button>
+                </DialogActions>
+            </Dialog>
+        </div>
+    )
+}
 
 
 

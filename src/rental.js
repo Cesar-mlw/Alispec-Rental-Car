@@ -33,9 +33,9 @@ const getSteps = () => {
 }
 const getStepContent = (stepIndex, props) => {
     switch (stepIndex) {
-        case 0: //Fazer if para saber se tem horario, se nao tiver coloca uma tela para avisar que nao tem horario
+        case 0: 
             let dateI = props.dataI.toLocaleDateString('en-GB')
-            locacao = JSON.parse(props.dataCall('POST','http://localhost:90/confirmedRental', '{"dataI": "'+dateI+'"}'))
+            locacao = props.dataCall('POST','http://localhost:90/confirmedRental', '{"dataI": "'+dateI+'"}')
             
             return (
                 <div>

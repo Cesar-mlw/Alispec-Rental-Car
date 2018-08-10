@@ -1,18 +1,12 @@
 import React from 'react';
-import { Typography, Toolbar, AppBar, Tabs, Tab, Grid, MenuItem, Snackbar, IconButton } from '@material-ui/core';
-import { DirectionsCar, Receipt, Close } from '@material-ui/icons'
+import { Typography, Toolbar, AppBar, Tabs, Tab, Grid, MenuItem, Snackbar, IconButton, Menu } from '@material-ui/core';
+import { DirectionsCar, Receipt, Close, AccountCircle, Storage } from '@material-ui/icons'
 import 'typeface-roboto'
 import Login from './login'
 import Cloudinary from 'cloudinary'
 import Rental from './rental'
 import Car from './car'
-const carArray = {
-    "cars": [
-        { "name": "Chevrolet S10", "desc": "Picape Chevrolet com motor de 206cv. Feita para transporte de cargas pequenas", "image": "https://res.cloudinary.com/dgeat0gpw/image/upload/v1531944498/s10.jpg" },
-        { "name": "Volkswagen Voyage", "desc": "Sedan com capacidade de 5 pessoas, transmissão manual e com ar condicionado", "image": "https://res.cloudinary.com/dgeat0gpw/image/upload/v1531944499/voyage.jpg" },
-        { "name": "Volkswagen Kombi", "desc": "Sedan com capacidade de 5 pessoas, transmissão manual e com ar condicionado", "image": "https://res.cloudinary.com/dgeat0gpw/image/upload/v1531945840/Kombi.jpg" }
-    ]
-}
+import CadastroU from './cadastro_usuario'
 Cloudinary.config({
     cloud_name: '#Input with cloud name - present in todo.txt',
     api_key: '#Input with api_key - present in todo.txt',
@@ -39,9 +33,10 @@ export default class Nav extends React.Component {
         //value to control top tabs
         auth: false,
         email: '',
-        senha: '',
         userId: 0,
-        loginDialog: true, //CHANGE THIS TO TRUE BEFORE SHIPPING IT OUT
+        admin: true, //CHANGE THIS TO FALSE BEFORE SHIPPING IT OUT
+        menu: null,
+        loginDialog: false, //CHANGE THIS TO TRUE BEFORE SHIPPING IT OUT
         //states that control the user login
         rentalDialog: false,
         duracao: 0,
@@ -59,48 +54,81 @@ export default class Nav extends React.Component {
         activeStep: 0,
         //state that controls stepper
         snackOpen: false,
-        snackMessage: ''
+        snackMessage: '',
         //states that controls snackbars
+        cadastroUDialog: false,
+        cadEmail: '',
+        cadNome: '',
+        cadDepartamento: '',
+        cadTipoUsuario: '',
+        cadActiveStep: 0
+        //States that control the user insertion
     };
-    //Change tabs
+
     handleChange = (event, value) => {
         this.setState({ value })
     }
+    handleMenuOpen = (event) => {
+        console.log(event.currentTarget);
+        this.setState({ menu: event.currentTarget })
+    }
+    handleMenuClose = () => {
+        this.setState({ menu: null })
+    }
+    //AppBar
     handleEmailChange = (event) => {
         this.setState({ email: event.target.value })
-    }
-    handleSenhaChange = (event) => {
-        this.setState({ senha: event.target.value })
     }
     handleLoginDialogClose = () => {
         this.setState({ loginDialog: false })
     }
-    handleClickLogin = () => {
+    handleClickLogin = async () => {
         //make text fields better
-        let validate = JSON.parse(this.dataCall('POST', 'http://localhost:90/validaUsuario', '{"email": "' + this.state.email + '", "senha": "' + this.state.senha + '"}'))
+        let validate = await this.dataCall('POST', 'http://localhost:90/validaUsuario', '{"email": "' + this.state.email + '"}')
         if (validate.length === 0) {
-            alert("E-mail ou Senha errada")
+            alert("E-mail ou Id errados")
         }
         else {
-            this.setState({ loginDialog: false, userId: validate[0].id_usuario, auth: true })
+            if (validate[0].fk_tipo_usuario_id === 1) this.setState({ loginDialog: false, userId: validate[0].id_usuario, admin: true, auth: true, snackOpen: true, snackMessage: 'Seja Bem vindo ' + validate[0].nome_usuario })
+            else this.setState({ loginDialog: false, userId: validate[0].id_usuario, auth: true, snackOpen: true, snackMessage: 'Seja Bem vindo ' + validate[0].nome_usuario })
         }
-    }
-    handleClickCadastro = () => {
-        console.log('Hello World');
     }
     //Login
+    handleCadastroUOpen = () => {
+        this.setState({cadastroUDialog: true})
+    }
+    handleCadastroUClose = () => {
+        this.setState({cadastroUDialog: false})
+    }
+    handleCadastroU = () => {
+
+    }
+    handleCadNext = () => {
+        const { cadActiveStep } = this.state
+        this.setState({cadActiveStep: cadActiveStep + 1})
+    }
+    handleCadBack = () => {
+        const { cadActiveStep } = this.state
+        this.setState({ cadActiveStep: cadActiveStep - 1 })
+    }
+    //Cadastro Usuario
+    handleCadastroVOpen = () => {
+        console.log('Hello World');
+    }
+    //Cadastro Veiculo
     sendCars = () => {
-        let components = []
-        let validate = JSON.parse(this.dataCall('GET', 'http://localhost:90/allVeiculo', null))
-        for (let i in validate.car) {
-            let image = validate.car[i].imgUrl_veiculo
-            components[i] = (<Grid item key={i}><Car
-                handleRentalDialogOpen={this.handleRentDialogOpen}
-                state={this.state} name={validate.car[i].nome_veiculo}
-                desc={validate.car[i].desc_veiculo} key={i} ano={validate.car[i].ano_veiculo} carId={validate.car[i].id_veiculo}
-                image={Cloudinary.url(image)}/></Grid>)
-        }
-        return components
+            let validate =  this.dataCall('GET', 'http://localhost:90/allVeiculo', null)
+            let components = []
+            for (let i in validate.car) {
+                let image = validate.car[i].imgUrl_veiculo
+                components[i] = (<Grid item key={i}><Car
+                    handleRentalDialogOpen={this.handleRentDialogOpen}
+                    state={this.state} name={validate.car[i].nome_veiculo}
+                    desc={validate.car[i].desc_veiculo} key={i} ano={validate.car[i].ano_veiculo} carId={validate.car[i].id_veiculo}
+                    image={Cloudinary.url(image)} /></Grid>)
+            }
+            return components
+        
     }
     //Car Card Handler
     handleRentDialogOpen = (number, name) => {
@@ -108,16 +136,18 @@ export default class Nav extends React.Component {
 
     }
     handleRentDialogClose = () => {
-        this.setState({ rentalDialog: false, 
-                        activeStep: 0,  
-                        inicioSelect: 0, 
-                        duracaoSelect: 0, 
-                        dataI: new Date(), 
-                        inicio: new Date(), 
-                        termino: new Date(), 
-                        duracao: 0,
-                        motivo: '',
-                        motorista: ''})
+        this.setState({
+            rentalDialog: false,
+            activeStep: 0,
+            inicioSelect: 0,
+            duracaoSelect: 0,
+            dataI: new Date(),
+            inicio: new Date(),
+            termino: new Date(),
+            duracao: 0,
+            motivo: '',
+            motorista: ''
+        })
     }
 
     handleRentalDataChange = (date) => {
@@ -125,10 +155,10 @@ export default class Nav extends React.Component {
         this.cleanSlots()
     }
     handleMotoristaChange = (event) => {
-        this.setState({motorista: event.target.value})
+        this.setState({ motorista: event.target.value })
     }
     handleMotivoChange = (event) => {
-        this.setState({motivo: event.target.value})
+        this.setState({ motivo: event.target.value })
     }
     handleRentalInicioChange = (event) => {
         let inicio = new Date(this.state.dataI.toDateString() + ' ' + event.target.value)
@@ -166,7 +196,7 @@ export default class Nav extends React.Component {
         else if (duracao === 8) duracao = '08:00:00'
         else if (duracao === 12) duracao = '12:00:00'
         else duracao = '24:00:00'
-        let response = JSON.parse(this.dataCall('POST', 'http://localhost:90/insertRental', '{"duracao": "' + duracao + '", "dataI": "' + this.state.dataI.toJSON() + '", "dataT": "' + dataT + '" , "inicio": "' + inicio.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "termino": "' + termino.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "userId": ' + this.state.userId + ', "veiId": ' + this.state.carId + ', "motivo": "'+this.state.motivo+'", "motorista": "'+this.state.motorista+'"}'))
+        let response = JSON.parse(this.dataCall('POST', 'http://localhost:90/insertRental', '{"duracao": "' + duracao + '", "dataI": "' + this.state.dataI.toJSON() + '", "dataT": "' + dataT + '" , "inicio": "' + inicio.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "termino": "' + termino.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "userId": ' + this.state.userId + ', "veiId": ' + this.state.carId + ', "motivo": "' + this.state.motivo + '", "motorista": "' + this.state.motorista + '"}'))
         if (response === 1) this.setState({ rentalDialog: false, activeStep: 0, inicioSelect: 0, duracaoSelect: 0, snackMessage: 'Aluguel feito com Sucesso!', snackOpen: true })
         else this.setState({ activeStep: 0, snackMessage: 'Ocorreu um Erro, Tente Novamente', snackOpen: true })
 
@@ -179,19 +209,22 @@ export default class Nav extends React.Component {
         this.setState({ Slots: Array(25).fill(null) })
     }
     dataCall = (method, url, data) => {
-        let call = new XMLHttpRequest()
-        let response = null
-        console.log(data);
-        call.onreadystatechange = () => {
-            if (call.readyState === 4 && call.status === 200) {
-                response = call.responseText
+            let call = new XMLHttpRequest()
+            let response = null
+            call.open(method, url, false)
+            call.setRequestHeader('Content-type', 'application/json')
+            call.onload = () => {
+                if (call.status === 200 && call.readyState === 4) {
+                    response = JSON.parse(call.responseText)
+                    console.log(response);
+                }
+                else {
+                    console.log(call.statusText);
+                }
             }
-        }
-        call.open(method, url, false)
-        call.setRequestHeader('Content-type', 'application/json')
-        if (method === 'POST') call.send(data)
-        else call.send()
-        return response
+            if (method === 'POST') call.send(data)
+            else call.send()
+            return response
     }
     fillSlots = (loc) => {
         let now = new Date(Date.now())
@@ -404,10 +437,9 @@ export default class Nav extends React.Component {
         }
         return components
     }
-
     render() {
         const { value } = this.state
-
+        const open = Boolean(this.state.menu)
         return (
             <div className={styles.root} style={{ paddingTop: 56 }} >
                 <AppBar position='fixed'>
@@ -424,26 +456,56 @@ export default class Nav extends React.Component {
                             style={{ marginLeft: 30 }}
                         >
                             <Tab label="Carros Disponíveis" icon={<DirectionsCar />} />
-                            <Tab label="Meus aluguéis" icon={<Receipt />} />
+                            <Tab label="Meus Aluguéis" icon={<Receipt />} />
+                            {this.state.admin && (<Tab label='Analytics' icon={<Storage />} />)}
                         </Tabs>
+
+                        {this.state.admin && (<div>
+                            <IconButton
+                                aria-owns={open ? 'menu-appbar' : null}
+                                arai-haspopup='true'
+                                onClick={this.handleMenuOpen}
+                                color='inherit'
+                            >
+                                <AccountCircle />
+                            </IconButton>
+                            <Menu
+                                id='menu-appbar'
+                                anchorEl={this.state.menu}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                open={open}
+                                onClose={this.handleMenuClose}
+                            >
+                                <MenuItem onClick={this.handleCadastroUOpen}>Cadastre um Usuário</MenuItem>
+                                <MenuItem onClick={this.handleCadastroVOpen}>Cadastre um Veículo</MenuItem>
+                            </Menu>
+                        </div>)}
                     </Toolbar>
                 </AppBar>
+                {/*TABS*/}
                 {value === 0 &&
                     <Grid container spacing={16} >
                         <Grid item xs={12}>
                             <Grid container spacing={16}>
-                                {this.sendCars(carArray)}
+                                {this.sendCars()}
                             </Grid>
                         </Grid>
                     </Grid>
                 }
                 {value === 1 && <React.Fragment>Hellos</React.Fragment>}
+                {value === 2 && <React.Fragment>Hellos</React.Fragment>}
                 {/*TABS*/}
                 {!this.state.auth && <Login state={this.state}
                     handleClickCadastro={this.handleClickCadastro}
                     handleClickLogin={this.handleClickLogin}
                     handleEmailChange={this.handleEmailChange}
-                    handleSenhaChange={this.handleSenhaChange}
                     handleLoginDialogClose={this.handleLoginDialogClose} />}
                 {/*LOGIN*/}
                 {this.state.rentalDialog && <Rental
@@ -451,7 +513,7 @@ export default class Nav extends React.Component {
                     email={this.state.email}
                     duracao={this.state.duracao}
                     dataI={this.state.dataI}
-                    termino = {this.state.termino}
+                    termino={this.state.termino}
                     inicio={this.state.inicio}
                     carId={this.state.carId}
                     carName={this.state.carName}
@@ -471,13 +533,31 @@ export default class Nav extends React.Component {
                     sendAvailableDuration={this.sendAvailableDuration}
                     motivo={this.state.motivo}
                     motorista={this.state.motorista}
-                    handleMotoristaChange = {this.handleMotoristaChange}
-                    handleMotivoChange = {this.handleMotivoChange}
-                    carNome = {this.state.carNome}
-                    handleRentalDialogExit = {this.handleRentalDialogExit}
+                    handleMotoristaChange={this.handleMotoristaChange}
+                    handleMotivoChange={this.handleMotivoChange}
+                    carNome={this.state.carNome}
+                    handleRentalDialogExit={this.handleRentalDialogExit}
                 />}
                 {/*RENTAL*/}
-
+                {this.state.cadastroUDialog && (
+                    <CadastroU 
+                        cadastroUDialog = {this.state.cadastroUDialog}
+                        cadEmail = {this.state.cadEmail}
+                        cadDepartamento = {this.state.cadDepartamento}
+                        cadNome = {this.state.cadNome}
+                        cadActiveStep = {this.state.cadActiveStep}
+                        //states
+                        cadTipoUsuario = {this.state.cadTipoUsuario}
+                        handleCadastroUOpen = {this.handleCadastroUOpen}
+                        handleCadastroUClose = {this.handleCadastroUClose}
+                        handleCadastroU = {this.handleCadastroU} 
+                        dataCall = {this.dataCall}
+                        handleCadNext = {this.handleCadNext}
+                        handleCadBack = {this.handleCadBack}
+                        //functions
+                    />
+                )}
+                {/* CADASTRO USUARIO */}
                 <Snackbar
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                     open={this.state.snackOpen}
