@@ -1,5 +1,10 @@
 import React, { Fragment } from 'react';
+<<<<<<< HEAD
 import { Button, Dialog, DialogTitle, TextField, withStyles, Stepper, StepLabel, Step, Typography, InputLabel, Select, MenuItem, Checkbox } from '@material-ui/core';
+=======
+import { Button, Dialog, DialogTitle, TextField, withStyles, Stepper, StepLabel, Step, Typography, InputLabel, Select, MenuItem } from '@material-ui/core';
+import { DatePicker, MuiPickersUtilsProvider} from 'material-ui-pickers';
+>>>>>>> edf679323fb577057fec7add28d5ffda67548a42
 
 const styles = {
     container: {
@@ -25,6 +30,7 @@ const styles = {
     }
 }
 const getSteps = () => {
+<<<<<<< HEAD
     return ['Insira as Informações', 'Informações adicionais']
 }
 const getStepContent = (stepIndex, props) => {
@@ -79,12 +85,24 @@ const getStepContent = (stepIndex, props) => {
                         <MenuItem value={4}>TI</MenuItem>
                         <MenuItem value={2}>Vendas</MenuItem>
                     </Select>
+=======
+    return ['Insira as Informações', 'Informações finais e confirmação']
+}
+const getStepContent = (stepIndex, props) => {
+    switch (stepIndex) {
+        case 0: 
+            
+            return (
+                <div>
+                    
+>>>>>>> edf679323fb577057fec7add28d5ffda67548a42
                 </div>
             )
 
         case 1:
             return (
                 <div>
+<<<<<<< HEAD
                     <Typography style={{ marginLeft: '4%', marginBottom: '2%', width: '80%' }} variant={'body2'} color= {'inherit'}>{props.cadNome} será um(a) administrador(a)?</Typography>
                     <InputLabel style={{ marginLeft: '4%', marginBottom: '2%', width: '80%' }}>Sim</InputLabel>
                     <Checkbox
@@ -100,6 +118,9 @@ const getStepContent = (stepIndex, props) => {
                         color={'primary'}
                         value = '1'
                     />
+=======
+                    
+>>>>>>> edf679323fb577057fec7add28d5ffda67548a42
                 </div>
             )
         default:
@@ -117,9 +138,15 @@ const CadastroDialog = (props) => {
                 onClose={props.handleCadastroUClose}
                 fullWidth>
                 <DialogTitle>Inserir Usuário</DialogTitle>
+<<<<<<< HEAD
                 {props.cadActiveStep === steps.length ? (
                     <div>
                     //Last Page
+=======
+                {props.activeStep === steps.length ? (
+                    <div>
+                        //Last Page
+>>>>>>> edf679323fb577057fec7add28d5ffda67548a42
                     </div>
                 ) : (
                         <div>

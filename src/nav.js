@@ -61,10 +61,14 @@ export default class Nav extends React.Component {
         cadNome: '',
         cadDepartamento: '',
         cadTipoUsuario: '',
+<<<<<<< HEAD
         cadRamal: '',
         cadActiveStep: 0,
         cadDeptoSelect: 0,
         cadAdminCheck: false,
+=======
+        cadActiveStep: 0
+>>>>>>> edf679323fb577057fec7add28d5ffda67548a42
         //States that control the user insertion
     };
 
@@ -114,6 +118,7 @@ export default class Nav extends React.Component {
         const { cadActiveStep } = this.state
         this.setState({ cadActiveStep: cadActiveStep - 1 })
     }
+<<<<<<< HEAD
     handleCadastroNomeChange = (event) => {
         this.setState({cadNome: event.target.value})
     }
@@ -132,6 +137,8 @@ export default class Nav extends React.Component {
     handleCadastroAdminChange = (event) => {
         this.setState({cadAdminCheck: event.target.checked})
     }
+=======
+>>>>>>> edf679323fb577057fec7add28d5ffda67548a42
     //Cadastro Usuario
     handleCadastroVOpen = () => {
         console.log('Hello World');
@@ -556,10 +563,19 @@ export default class Nav extends React.Component {
                     sendAvailableHours={this.sendAvailableHours}
                     dataCall={this.dataCall}
                     sendAvailableDuration={this.sendAvailableDuration}
+<<<<<<< HEAD
                     handleMotoristaChange={this.handleMotoristaChange}
                     handleMotivoChange={this.handleMotivoChange}
                     handleRentalDialogExit={this.handleRentalDialogExit}
                     //functions
+=======
+                    motivo={this.state.motivo}
+                    motorista={this.state.motorista}
+                    handleMotoristaChange={this.handleMotoristaChange}
+                    handleMotivoChange={this.handleMotivoChange}
+                    carNome={this.state.carNome}
+                    handleRentalDialogExit={this.handleRentalDialogExit}
+>>>>>>> edf679323fb577057fec7add28d5ffda67548a42
                 />}
                 {/*RENTAL*/}
                 {this.state.cadastroUDialog && (
@@ -569,8 +585,11 @@ export default class Nav extends React.Component {
                         cadDepartamento = {this.state.cadDepartamento}
                         cadNome = {this.state.cadNome}
                         cadActiveStep = {this.state.cadActiveStep}
+<<<<<<< HEAD
                         cadDeptoSelect = {this.state.cadDeptoSelect}
                         cadAdminCheck = {this.state.cadAdminCheck}
+=======
+>>>>>>> edf679323fb577057fec7add28d5ffda67548a42
                         //states
                         cadTipoUsuario = {this.state.cadTipoUsuario}
                         handleCadastroUOpen = {this.handleCadastroUOpen}
@@ -579,12 +598,15 @@ export default class Nav extends React.Component {
                         dataCall = {this.dataCall}
                         handleCadNext = {this.handleCadNext}
                         handleCadBack = {this.handleCadBack}
+<<<<<<< HEAD
                         handleCadastroNomeChange = {this.handleCadastroNomeChange}
                         handleCadastroEmailChange = {this.handleCadastroEmailChange}
                         handleCadastroDepartamentoChange = {this.handleCadastroDepartamentoChange}
                         handleCadastroTipoUsuarioChange = {this.handleCadastroTipoUsuarioChange}
                         handleCadastroRamalChange = {this.handleCadastroRamalChange}
                         handleCadastroAdminChange = {this.handleCadastroAdminChange}
+=======
+>>>>>>> edf679323fb577057fec7add28d5ffda67548a42
                         //functions
                     />
                 )}
