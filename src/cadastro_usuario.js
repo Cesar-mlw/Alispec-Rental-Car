@@ -33,23 +33,7 @@ const CadastroDialog = (props) => {
                 open={props.cadastroUDialog}
                 onClose={props.handleCadastroUClose}
                 fullWidth>
-                <DialogTitle>Usuário</DialogTitle>
-                <AppBar>
-                    <Toolbar>
-                        <Tabs
-                            value={props.cadValue}
-                            onChange={props.handleCadTabs}
-                            indicatorColor='secondary'
-                            textColor='inherit'
-                            fullWidth
-                        >
-                            <Tab label='Cadastrar usuário' />
-                            <Tab label='Editar usuário' />
-                        </Tabs>
-
-                    </Toolbar>
-                </AppBar>
-                {props.cadValue === 0 && (
+                <DialogTitle>Cadastrar Usuário</DialogTitle>
                     <div>
                         <TextField
                             id='nome_usuario'
@@ -107,12 +91,12 @@ const CadastroDialog = (props) => {
                             color={'primary'}
                             value='0'
                         />
+                        
                     </div>
-                )}
-                {props.cadValue === 1 && (
-                    //FAZER PAGINA DE EDICAO
-                    <Typography>NOTHING HERE</Typography>    
-                )}
+                    {<br/>}
+                    <Button onClick={props.handleCadastroU} color='primary' size='medium' variant='raised' style={{margin:'0 auto' , marginBottom: '4%' , width: '20%'}}>
+                            Cadastrar
+                    </Button>
             </Dialog>
         </div>
     )

@@ -108,6 +108,7 @@ export default class Nav extends React.Component {
                         cadDepartamento: 0})
     }
     handleCadastroU = () => {
+        console.log(this.state.cadTipoUsuario);
         this.dataCall('POST', 'http://localhost:90/insertUsu', '{"usuario": "'+this.state.cadNome+'", "email": "'+this.state.cadEmail+'", "ramal": "'+this.state.cadRamal+'", "tipoUsuario": "'+this.state.cadTipoUsuario+'", "departamento": "'+this.state.cadDepartamento+'"}')
         this.setState({cadastroUDialog: false,
             cadActiveStep: 0,
