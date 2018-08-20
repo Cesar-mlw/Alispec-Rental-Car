@@ -139,10 +139,18 @@ export default class Nav extends React.Component {
         this.setState({cadAdminCheck: event.target.checked})
     }
     //Cadastro Usuario
+    handleEdicaoUOpen = () => {
+
+    }
+    //Edicao Usuario
     handleCadastroVOpen = () => {
         console.log('Hello World');
     }
     //Cadastro Veiculo
+    handleEdicaoVOpen = () => {
+
+    }
+    //Edicao Veiculo
     sendCars = () => {
             let validate =  this.dataCall('GET', 'http://localhost:90/allVeiculo', null)
             let components = []
@@ -511,7 +519,9 @@ export default class Nav extends React.Component {
                                 onClose={this.handleMenuClose}
                             >
                                 <MenuItem onClick={this.handleCadastroUOpen}>Cadastre um Usuário</MenuItem>
+                                <MenuItem onClick={this.handleEdicaoUOpen}>Edite um Usuário</MenuItem>
                                 <MenuItem onClick={this.handleCadastroVOpen}>Cadastre um Veículo</MenuItem>
+                                <MenuItem onClick={this.handleEdicaoVOpen}>Edite um Veículo</MenuItem>
                             </Menu>
                         </div>)}
                     </Toolbar>
