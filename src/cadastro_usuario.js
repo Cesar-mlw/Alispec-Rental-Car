@@ -1,5 +1,5 @@
-import React, { Fragment } from 'react';
-import { Button, Dialog, DialogTitle, TextField, withStyles,  Typography, InputLabel, Select, MenuItem, Checkbox, AppBar, Toolbar, Tabs, Tab } from '@material-ui/core';
+import React from 'react';
+import { Button, Dialog, DialogTitle, TextField, withStyles,  Typography, InputLabel, Select, MenuItem, Checkbox} from '@material-ui/core';
 
 const styles = {
     container: {
@@ -25,7 +25,6 @@ const styles = {
     }
 }
 const CadastroDialog = (props) => {
-    const { cadValue } = props.cadValue
     const { classes } = props
     return (
         <div className={classes.root}>

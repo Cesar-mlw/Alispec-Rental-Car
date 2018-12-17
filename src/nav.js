@@ -7,6 +7,7 @@ import Cloudinary from 'cloudinary'
 import Rental from './rental'
 import Car from './car'
 import CadastroU from './cadastro_usuario'
+import EdicaoU from './editar_usuario'
 Cloudinary.config({
     cloud_name: '#Input with cloud name - present in todo.txt',
     api_key: '#Input with api_key - present in todo.txt',
@@ -65,6 +66,9 @@ export default class Nav extends React.Component {
         cadValue: 0,
         cadAdminCheck: false,
         //States that control the user insertion
+        edicaoUDialog: false,
+        edicaoStep: 0
+        //States that control user manipulation
     };
 
     handleChange = (event, value) => {
@@ -96,51 +100,80 @@ export default class Nav extends React.Component {
     }
     //Login
     handleCadastroUOpen = () => {
-        this.setState({cadastroUDialog: true})
+        this.setState({ cadastroUDialog: true })
     }
     handleCadastroUClose = () => {
-        this.setState({cadastroUDialog: false,
-                        cadActiveStep: 0,
-                        cadNome: '',
-                        cadEmail: '',
-                        cadAdminCheck: false,
-                        cadRamal: '',
-                        cadDepartamento: 0})
-    }
-    handleCadastroU = () => {
-        console.log(this.state.cadTipoUsuario);
-        this.dataCall('POST', 'http://localhost:90/insertUsu', '{"usuario": "'+this.state.cadNome+'", "email": "'+this.state.cadEmail+'", "ramal": "'+this.state.cadRamal+'", "tipoUsuario": "'+this.state.cadTipoUsuario+'", "departamento": "'+this.state.cadDepartamento+'"}')
-        this.setState({cadastroUDialog: false,
+        this.setState({
+            cadastroUDialog: false,
             cadActiveStep: 0,
             cadNome: '',
             cadEmail: '',
             cadAdminCheck: false,
             cadRamal: '',
-            cadDepartamento: 0})
+            cadDepartamento: 0
+        })
     }
-    handleCadTabs = (value) => {
-        this.setState({cadValue: value})
+    handleCadastroU = () => {
+        console.log(this.state.cadTipoUsuario);
+        this.dataCall('POST', 'http://localhost:90/insertUsu', '{"usuario": "' + this.state.cadNome + '", "email": "' + this.state.cadEmail + '", "ramal": "' + this.state.cadRamal + '", "tipoUsuario": "' + this.state.cadTipoUsuario + '", "departamento": "' + this.state.cadDepartamento + '"}')
+        this.setState({
+            cadastroUDialog: false,
+            cadActiveStep: 0,
+            cadNome: '',
+            cadEmail: '',
+            cadAdminCheck: false,
+            cadRamal: '',
+            cadDepartamento: 0
+        })
     }
     handleCadastroNomeChange = (event) => {
-        this.setState({cadNome: event.target.value})
+        this.setState({ cadNome: event.target.value })
     }
-    handleCadastroEmailChange= (event) => {
-        this.setState({cadEmail: event.target.value})
+    handleCadastroEmailChange = (event) => {
+        this.setState({ cadEmail: event.target.value })
     }
     handleCadastroDepartamentoChange = (event) => {
-        this.setState({cadDepartamento: event.target.value})
+        this.setState({ cadDepartamento: event.target.value })
     }
     handleCadastroRamalChange = (event) => {
-        this.setState({cadRamal: event.target.value})
+        this.setState({ cadRamal: event.target.value })
     }
     handleCadastroAdminChange = (event) => {
-        if(event.target.checked) this.setState({cadTipoUsuario: 1})
-        else this.setState({cadTipoUsuario: 2})
-        this.setState({cadAdminCheck: event.target.checked})
+        if (event.target.checked) this.setState({ cadTipoUsuario: 1 })
+        else this.setState({ cadTipoUsuario: 2 })
+        console.log("object");
+        this.setState({ cadAdminCheck: event.target.checked })
     }
     //Cadastro Usuario
     handleEdicaoUOpen = () => {
+        this.setState({ edicaoUDialog: true })
+    }
+    handleEdicaoUClose = () => {
+        this.setState({ edicaoUDialog: false })
+    }
+    handleEdicaoNext = () => {
+        let edicaoStep = this.state.edicaoStep
+        if(edicaoStep === 0){
+            let answer = this.dataCall('POST','http://localhost:90/editaUsuario', '{"email": "'+this.state.cadEmail+'"}')
+            if(answer.length === 0){
+                this.setState({snackOpen: true, snackMessage: 'Nenhum Usuário encontrado', cadEmail: ''})
+                return
+            }
+            else{
+                if(answer[0].fk_tipo_usuario_id === 1)this.setState({cadAdminCheck: true})
+                console.log(this.state.cadAdminCheck);
+                this.setState({cadNome: answer[0].nome_usuario, cadEmail: answer[0].email_usuario, cadRamal: answer[0].ramal_usuario, cadDepartamento: answer[0].fk_departamento_id})
+            }
 
+        }
+        else if(edicaoStep === 1){
+
+        }
+        this.setState({edicaoStep: edicaoStep + 1})
+    }
+    handleEdicaoBack = () => {
+        let edicaoStep = this.state.edicaoStep
+        this.setState({edicaoStep: edicaoStep - 1})
     }
     //Edicao Usuario
     handleCadastroVOpen = () => {
@@ -152,18 +185,18 @@ export default class Nav extends React.Component {
     }
     //Edicao Veiculo
     sendCars = () => {
-            let validate =  this.dataCall('GET', 'http://localhost:90/allVeiculo', null)
-            let components = []
-            for (let i in validate.car) {
-                let image = validate.car[i].imgUrl_veiculo
-                components[i] = (<Grid item key={i}><Car
-                    handleRentalDialogOpen={this.handleRentDialogOpen}
-                    state={this.state} name={validate.car[i].nome_veiculo}
-                    desc={validate.car[i].desc_veiculo} key={i} ano={validate.car[i].ano_veiculo} carId={validate.car[i].id_veiculo}
-                    image={Cloudinary.url(image)} /></Grid>)
-            }
-            return components
-        
+        let validate = this.dataCall('GET', 'http://localhost:90/allVeiculo', null)
+        let components = []
+        for (let i in validate.car) {
+            let image = validate.car[i].imgUrl_veiculo
+            components[i] = (<Grid item key={i}><Car
+                handleRentalDialogOpen={this.handleRentDialogOpen}
+                state={this.state} name={validate.car[i].nome_veiculo}
+                desc={validate.car[i].desc_veiculo} key={i} ano={validate.car[i].ano_veiculo} carId={validate.car[i].id_veiculo}
+                image={Cloudinary.url(image)} /></Grid>)
+        }
+        return components
+
     }
     //Car Card Handler
     handleRentDialogOpen = (number, name) => {
@@ -244,22 +277,18 @@ export default class Nav extends React.Component {
         this.setState({ Slots: Array(25).fill(null) })
     }
     dataCall = (method, url, data) => {
-            let call = new XMLHttpRequest()
-            let response = null
-            call.open(method, url, false)
-            call.setRequestHeader('Content-type', 'application/json')
-            call.onload = () => {
-                if (call.status === 200 && call.readyState === 4) {
-                    response = JSON.parse(call.responseText)
-                    console.log(response);
-                }
-                else {
-                    console.log(call.statusText);
-                }
+        let call = new XMLHttpRequest()
+        let response = null
+        call.open(method, url, false)
+        call.setRequestHeader('Content-type', 'application/json')
+        call.onload = () => {
+            if (call.status === 200 && call.readyState === 4) {
+                response = JSON.parse(call.responseText)
             }
-            if (method === 'POST') call.send(data)
-            else call.send()
-            return response
+        }
+        if (method === 'POST') call.send(data)
+        else call.send()
+        return response
     }
     fillSlots = (loc) => {
         let now = new Date(Date.now())
@@ -575,34 +604,54 @@ export default class Nav extends React.Component {
                     handleMotoristaChange={this.handleMotoristaChange}
                     handleMotivoChange={this.handleMotivoChange}
                     handleRentalDialogExit={this.handleRentalDialogExit}
-                    //functions
+                //functions
                 />}
                 {/*RENTAL*/}
                 {this.state.cadastroUDialog && (
-                    <CadastroU 
-                        cadastroUDialog = {this.state.cadastroUDialog}
-                        cadEmail = {this.state.cadEmail}
-                        cadDepartamento = {this.state.cadDepartamento}
-                        cadNome = {this.state.cadNome}
-                        cadValue = {this.state.cadValue}
-                        cadAdminCheck = {this.state.cadAdminCheck}
-                        cadTipoUsuario = {this.state.cadTipoUsuario}
+                    <CadastroU
+                        cadastroUDialog={this.state.cadastroUDialog}
+                        cadEmail={this.state.cadEmail}
+                        cadDepartamento={this.state.cadDepartamento}
+                        cadNome={this.state.cadNome}
+                        cadAdminCheck={this.state.cadAdminCheck}
+                        cadTipoUsuario={this.state.cadTipoUsuario}
                         //states
-                        handleCadastroUOpen = {this.handleCadastroUOpen}
-                        handleCadastroUClose = {this.handleCadastroUClose}
-                        handleCadastroU = {this.handleCadastroU} 
-                        dataCall = {this.dataCall}
-                        handleCadTabs = {this.handleCadTabs}
-                        handleCadastroNomeChange = {this.handleCadastroNomeChange}
-                        handleCadastroEmailChange = {this.handleCadastroEmailChange}
-                        handleCadastroDepartamentoChange = {this.handleCadastroDepartamentoChange}
-                        handleCadastroTipoUsuarioChange = {this.handleCadastroTipoUsuarioChange}
-                        handleCadastroRamalChange = {this.handleCadastroRamalChange}
-                        handleCadastroAdminChange = {this.handleCadastroAdminChange}
-                        //functions
+                        handleCadastroUOpen={this.handleCadastroUOpen}
+                        handleCadastroUClose={this.handleCadastroUClose}
+                        handleCadastroU={this.handleCadastroU}
+                        dataCall={this.dataCall}
+                        handleCadastroNomeChange={this.handleCadastroNomeChange}
+                        handleCadastroEmailChange={this.handleCadastroEmailChange}
+                        handleCadastroDepartamentoChange={this.handleCadastroDepartamentoChange}
+                        handleCadastroTipoUsuarioChange={this.handleCadastroTipoUsuarioChange}
+                        handleCadastroRamalChange={this.handleCadastroRamalChange}
+                        handleCadastroAdminChange={this.handleCadastroAdminChange}
+                    //functions
                     />
                 )}
                 {/* CADASTRO USUARIO */}
+                {this.state.edicaoUDialog && (
+                    <EdicaoU
+                        cadNome={this.state.cadNome}
+                        edicaoUDialog = {this.state.edicaoUDialog}
+                        cadEmail={this.state.cadEmail}
+                        cadRamal={this.state.cadRamal}
+                        cadAdmninCheck={this.state.cadAdminCheck}
+                        cadDepartamento={this.state.cadDepartamento}
+                        edicaoStep = {this.state.edicaoStep}
+                        //states
+                        handleCadastroNomeChange={this.handleCadastroNomeChange}
+                        handleCadastroEmailChange={this.handleCadastroEmailChange}
+                        handleCadastroDepartamentoChange={this.handleCadastroDepartamentoChange}
+                        handleCadastroRamalChange={this.handleCadastroRamalChange}
+                        handleCadastroAdminChange={this.handleCadastroAdminChange}
+                        handleEdicaoNext = {this.handleEdicaoNext}
+                        handleEdicaoBack = {this.handleEdicaoBack}
+                        handleClickEdicao = {this.handleClickEdicao}
+                    //functions
+                    />
+                )}
+                {/* EDICAO USUARIO */}
                 <Snackbar
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                     open={this.state.snackOpen}
