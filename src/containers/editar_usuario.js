@@ -137,18 +137,18 @@ class EdicaoDialog extends React.Component {
     }
     render() {
         const steps = getSteps()
-        const { classes } = props
+        const { classes } = this.props
         return (
             <div className={classes.root}>
                 <Dialog
-                    open={props.edicaoUDialog}
-                    onClose={props.handleEdicaoUClose}
+                    open={this.props.edicaoUDialog}
+                    onClose={this.props.handleEdicaoUClose}
                     fullWidth>
                     <DialogTitle>Edição de Usuário</DialogTitle>
-                    {props.edicaoStep === steps.length ? (
+                    {this.props.edicaoStep === steps.length ? (
                         <div>
                             <Stepper
-                                activeStep={props.edicaoStep} alternativeLabel>
+                                activeStep={this.props.edicaoStep} alternativeLabel>
                                 {steps.map(label => {
                                     return (
                                         <Step key={label}>
@@ -157,16 +157,16 @@ class EdicaoDialog extends React.Component {
                                     )
                                 })}
                             </Stepper>
-                            <Button onClick={props.handleClickEdicao} className={classes.button}>
+                            <Button onClick={this.props.handleClickEdicao} className={classes.button}>
                                 Editar
                         </Button>
                         </div>
                     ) : (
                             <div>
-                                {getStepContent(props.edicaoStep, props)}
+                                {getStepContent(this.props.edicaoStep, this.props)}
                                 <div>
                                     <Stepper
-                                        activeStep={props.edicaoStep} alternativeLabel>
+                                        activeStep={this.props.edicaoStep} alternativeLabel>
                                         {steps.map(label => {
                                             return (
                                                 <Step key={label}>
@@ -176,14 +176,14 @@ class EdicaoDialog extends React.Component {
                                         })}
                                     </Stepper>
                                     <Button
-                                        disabled={props.edicaoStep === 0}
-                                        onClick={props.handleEdicaoBack}
+                                        disabled={this.props.edicaoStep === 0}
+                                        onClick={this.props.handleEdicaoBack}
                                         className={classes.button}
                                     >
                                         Voltar
                             </Button>
-                                    <Button className={classes.button} variant='raised' color='primary' onClick={props.handleEdicaoNext}>
-                                        {props.edicaStem === steps.length - 1 ? 'Finalizar' : 'Próximo'}
+                                    <Button className={classes.button} variant='raised' color='primary' onClick={this.props.handleEdicaoNext}>
+                                        {this.props.edicaStem === steps.length - 1 ? 'Finalizar' : 'Próximo'}
                                     </Button>
                                 </div>
                             </div>

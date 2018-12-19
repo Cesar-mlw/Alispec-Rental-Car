@@ -88,8 +88,8 @@ class CadastroDialog extends React.Component {
         return (
             <div className={classes.root}>
                 <Dialog
-                    open={props.cadastroUDialog}
-                    onClose={props.handleCadastroUClose}
+                    open={this.props.cadastroUDialog}
+                    onClose={this.props.handleCadastroUClose}
                     fullWidth>
                     <DialogTitle>Cadastrar Usuário</DialogTitle>
                     <div>
@@ -97,8 +97,8 @@ class CadastroDialog extends React.Component {
                             id='nome_usuario'
                             label='Nome do Usuário'
                             placeholder='Manoel Bandeira'
-                            value={props.cadNome}
-                            onChange={props.handleCadastroNomeChange}
+                            value={this.props.cadNome}
+                            onChange={this.props.handleCadastroNomeChange}
                             margin='normal'
                             required
                             style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
@@ -107,8 +107,8 @@ class CadastroDialog extends React.Component {
                             id='email_usuario'
                             label='E-mail do Usuário'
                             placeholder='manoel_bandeira@alispec.com.br'
-                            value={props.cadEmail}
-                            onChange={props.handleCadastroEmailChange}
+                            value={this.props.cadEmail}
+                            onChange={this.props.handleCadastroEmailChange}
                             margin='normal'
                             required
                             style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
@@ -117,15 +117,15 @@ class CadastroDialog extends React.Component {
                             id='ramal_usuario'
                             label='Ramal do Usuário'
                             placeholder='1234 '
-                            value={props.cadRamal}
-                            onChange={props.handleCadastroRamalChange}
+                            value={this.props.cadRamal}
+                            onChange={this.props.handleCadastroRamalChange}
                             margin='normal'
                             style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
                         />
                         <InputLabel required style={{ marginLeft: '4%', marginBottom: '4%', width: '50%' }}>Qual o departamento desse Usuário?</InputLabel>
                         <Select
-                            value={props.cadDepartamento}
-                            onChange={props.handleCadastroDepartamentoChange}
+                            value={this.props.cadDepartamento}
+                            onChange={this.props.handleCadastroDepartamentoChange}
                             style={{ marginLeft: '4%', marginBottom: '4%', width: '40%' }}
                         >
                             <MenuItem value={0}>Departamento</MenuItem>
@@ -141,18 +141,18 @@ class CadastroDialog extends React.Component {
                             <MenuItem value={4}>TI</MenuItem>
                             <MenuItem value={2}>Vendas</MenuItem>
                         </Select>
-                        <Typography style={{ marginLeft: '4%', marginBottom: '2%', width: '80%' }} variant={'body2'} color={'inherit'}>{props.cadNome} será um(a) administrador(a)?</Typography>
+                        <Typography style={{ marginLeft: '4%', marginBottom: '2%', width: '80%' }} variant={'body2'} color={'inherit'}>{this.props.cadNome} será um(a) administrador(a)?</Typography>
                         <InputLabel style={{ marginLeft: '4%', marginBottom: '2%', width: '80%' }}>Sim</InputLabel>
                         <Checkbox
-                            checked={props.cadAdminCheck}
-                            onClick={props.handleCadastroAdminChange}
+                            checked={this.props.cadAdminCheck}
+                            onClick={this.props.handleCadastroAdminChange}
                             color={'primary'}
                             value='0'
                         />
 
                     </div>
                     {<br />}
-                    <Button onClick={props.handleCadastroU} color='primary' size='medium' variant='raised' style={{ margin: '0 auto', marginBottom: '4%', width: '20%' }}>
+                    <Button onClick={this.props.handleCadastroU} color='primary' size='medium' variant='raised' style={{ margin: '0 auto', marginBottom: '4%', width: '20%' }}>
                         Cadastrar
                     </Button>
                 </Dialog>

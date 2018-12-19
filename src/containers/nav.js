@@ -4,7 +4,7 @@ import { DirectionsCar, Receipt, Close, AccountCircle, Storage } from '@material
 import 'typeface-roboto'
 import Login from './login'
 import Cloudinary from 'cloudinary'
-import Rental from './rental'
+import Rental from '../rental'
 import Car from './car'
 import CadastroU from './cadastro_usuario'
 import EdicaoU from './editar_usuario'
@@ -46,8 +46,11 @@ export default class Nav extends React.Component {
         cadastroUDialog: false,
         //States that control the user insertion
         edicaoUDialog: false,
-        edicaoStep: 0
+        edicaoStep: 0,
         //States that control user manipulation
+        rentalDialog: false,
+        carId: null,
+        carName: null
     };
 
     handleChange = (event, value) => {
@@ -77,10 +80,16 @@ export default class Nav extends React.Component {
             else this.setState({ loginDialog: false, userId: validate[0].id_usuario, auth: true, snackOpen: true, snackMessage: 'Seja Bem vindo ' + validate[0].nome_usuario })
         }
     }
+    handleRentalDialogOpen = (carId, name) => {
+        this.setState({rentalDialog: true, carId: carId, carName: name})
+    }
+    handleRentalDialogClose = () => {
+        this.setState({rentalDialog: false, carId: null, carName: false})
+    }
     //Login
     handleCadastroUOpen = () => {
-        this.setState({ 
-            cadastroUDialog: true 
+        this.setState({
+            cadastroUDialog: true
         })
     }
     handleCadastroUClose = () => {
@@ -101,7 +110,7 @@ export default class Nav extends React.Component {
     }
     //Cadastro Veiculo
     handleEdicaoVOpen = () => {
-
+        //implement vehicle edition - difficulty expected -> update the car image on cloudinary
     }
     //Edicao Veiculo
     sendCars = () => {
@@ -120,7 +129,7 @@ export default class Nav extends React.Component {
     }
     //Car Card Handler
     handleSnackOpen = (message) => {
-        this.setState({snackOpen: true, snackMessage: message})
+        this.setState({ snackOpen: true, snackMessage: message })
     }
     handleSnackClose = (reason) => {
         if (reason === 'clickaway') return
@@ -217,10 +226,13 @@ export default class Nav extends React.Component {
                     handleLoginDialogClose={this.handleLoginDialogClose} />}
                 {/*LOGIN*/}
                 {this.state.rentalDialog && <Rental
+                    rentalDialog = {this.state.rentalDialog}
+                    carId = {this.carId}
+                    carName = {this.carName}
                     dataCall={this.dataCall}
-                    handleSnackOpen = {this.handleSnackOpen}
-                    handleSnackClose = {this.handleSnackClose}
-                //functions
+                    handleSnackOpen={this.handleSnackOpen}
+                    handleSnackClose={this.handleSnackClose}
+                    userId = {this.state.userId}
                 />}
                 {/*RENTAL*/}
                 {this.state.cadastroUDialog && (
@@ -248,8 +260,8 @@ export default class Nav extends React.Component {
                 {/* CADASTRO USUARIO */}
                 {this.state.edicaoUDialog && (
                     <EdicaoU
-                        dataCall = {this.dataCall}
-                        handleEdicaoUClose = {this.handleEdicaoUClose}
+                        dataCall={this.dataCall}
+                        handleEdicaoUClose={this.handleEdicaoUClose}
                     />
                 )}
                 {/* EDICAO USUARIO */}

@@ -34,7 +34,7 @@ const getSteps = () => {
 const getStepContent = (stepIndex, props, state) => {
     switch (stepIndex) {
         case 0:
-            let dateI = props.dataI.toLocaleDateString('en-GB')
+            let dateI = this.state.dataI.toLocaleDateString('en-GB')
             locacao = props.dataCall('POST', 'http://localhost:90/confirmedRental', '{"dataI": "' + dateI + '"}')
 
             return (
@@ -390,19 +390,25 @@ class RentalDialog extends React.Component {
         else if (duracao === 6) duracao = '06:00:00'
         else if (duracao === 8) duracao = '08:00:00'
         else if (duracao === 12) duracao = '12:00:00'
-        let response = JSON.parse(this.dataCall('POST', 'http://localhost:90/insertRental', '{"duracao": "' + duracao + '", "dataI": "' + this.state.dataI.toJSON() + '", "dataT": "' + dataT + '" , "inicio": "' + inicio.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "termino": "' + termino.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "userId": ' + this.state.userId + ', "veiId": ' + this.state.carId + ', "motivo": "' + this.state.motivo + '", "motorista": "' + this.state.motorista + '"}'))
-        if (response === 1) this.setState({ rentalDialog: false, activeStep: 0, inicioSelect: 0, duracaoSelect: 0, snackMessage: 'Aluguel feito com Sucesso!', snackOpen: true })// add snack 
-        else this.setState({ activeStep: 0, snackMessage: 'Ocorreu um Erro, Tente Novamente', snackOpen: true })// add snack
+        let response = JSON.parse(this.props.dataCall('POST', 'http://localhost:90/insertRental', '{"duracao": "' + duracao + '", "dataI": "' + this.state.dataI.toJSON() + '", "dataT": "' + dataT + '" , "inicio": "' + inicio.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "termino": "' + termino.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "userId": ' + this.props.userId + ', "veiId": ' + this.props.carId + ', "motivo": "' + this.state.motivo + '", "motorista": "' + this.state.motorista + '"}'))
+        if(response === 1) {
+            this.props.handleSnackOpen("Aluguel efetuado com sucesso") 
+            this.setState({ rentalDialog: false, activeStep: 0, inicioSelect: 0, duracaoSelect: 0,})
+        }
+        else {
+            this.props.handleSnackOpen("Ocorreu um Erro, tente novamente")
+            this.setState({ activeStep: 0})
+        }// add snack error
 
     }
 render(){
     const steps = getSteps()
     const { activeStep } = this.state.activeStep
-    const { classes } = props
+    const { classes } = this.props
     return (
         <div className={classes.root}>
             <Dialog
-                open={props.rentalDialog}
+                open={this.props.rentalDialog}
                 onClose={this.handleRentalDialogClose}
                 fullWidth>
                 <DialogTitle>Rental</DialogTitle>
@@ -479,7 +485,7 @@ render(){
                     </div>
                 ) : (
                         <div>
-                            {getStepContent(this.state.activeStep, props, state)}
+                            {getStepContent(this.state.activeStep, this.props, this.state)}
                             <div>
                                 <Stepper
                                     activeStep={this.state.activeStep} alternativeLabel>

@@ -12,34 +12,36 @@ const styles = {
         marginTop: 20
     }
 }
-function CarCard(props) {
-    const {classes} = props
-    return(
-        <div className={classes.div}>
+class CarCard extends React.Component {
+    render() {
+        const { classes } = this.props
+        return (
+            <div className={classes.div}>
                 <Card className={classes.card} >
-                    <CardMedia 
-                    className = {classes.media} 
-                    image = {props.image}
-                    title={props.name}/>
+                    <CardMedia
+                        className={classes.media}
+                        image={this.props.image}
+                        title={this.props.name} />
                     <CardContent>
                         <Typography gutterBottom variant="headline" component="h2">
-                            {props.name}
+                            {this.props.name}
                         </Typography>
                         <Typography component='p'>
-                            {props.desc}
-                            {<br/>}
-                            
-                            Ano:{' ' + props.ano}
+                            {this.props.desc}
+                            {<br />}
+
+                            Ano:{' ' + this.props.ano}
                         </Typography>
                     </CardContent>
                     <CardActions>
-                        <Button size="small" color="primary" onClick={() => props.handleRentalDialogOpen(props.carId, props.name)}>
+                        <Button size="small" color="primary" onClick={() => this.props.handleRentalDialogOpen(this.props.carId, this.props.name)}>
                             Reservar
                         </Button>
                     </CardActions>
                 </Card>
             </div>
-    )
+        )
+    }
 }
 
 export default withStyles(styles)(CarCard)
