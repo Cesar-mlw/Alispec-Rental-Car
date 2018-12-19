@@ -110,62 +110,88 @@ const getStepContent = (stepIndex, props) => {
             return 'Wrong StepIndex - Contact Cesar and ask him to fix it (11)99488-1864, or fix it yourself :3'
     }
 }
-const EdicaoDialog = (props) => {
-    const steps = getSteps()
-    const { classes } = props
-    return (
-        <div className={classes.root}>
-            <Dialog
-                open={props.edicaoUDialog}
-                onClose={props.handleEdicaoUClose}
-                fullWidth>
-                <DialogTitle>Edição de Usuário</DialogTitle>
-                {props.edicaoStep === steps.length ? (
-                    <div>
-                        <Stepper
-                            activeStep={props.edicaoStep} alternativeLabel>
-                            {steps.map(label => {
-                                return (
-                                    <Step key={label}>
-                                        <StepLabel>{label}</StepLabel>
-                                    </Step>
-                                )
-                            })}
-                        </Stepper>
-                        <Button onClick={props.handleClickEdicao} className={classes.button}>
-                            Editar
-                        </Button>
-                    </div>
-                ) : (
+class EdicaoDialog extends React.Component {
+    handleEdicaoNext = () => {
+        let edicaoStep = this.state.edicaoStep
+        if (edicaoStep === 0) {
+            let answer = this.dataCall('POST', 'http://localhost:90/editaUsuario', '{"email": "' + this.state.cadEmail + '"}')
+            if (answer.length === 0) {
+                this.setState({ snackOpen: true, snackMessage: 'Nenhum Usuário encontrado', cadEmail: '' })
+                return
+            }
+            else {
+                if (answer[0].fk_tipo_usuario_id === 1) this.setState({ cadAdminCheck: true })
+                console.log(this.state.cadAdminCheck);
+                this.setState({ cadNome: answer[0].nome_usuario, cadEmail: answer[0].email_usuario, cadRamal: answer[0].ramal_usuario, cadDepartamento: answer[0].fk_departamento_id })
+            }
+
+        }
+        else if (edicaoStep === 1) {
+
+        }
+        this.setState({ edicaoStep: edicaoStep + 1 })
+    }
+    handleEdicaoBack = () => {
+        let edicaoStep = this.state.edicaoStep
+        this.setState({ edicaoStep: edicaoStep - 1 })
+    }
+    render() {
+        const steps = getSteps()
+        const { classes } = props
+        return (
+            <div className={classes.root}>
+                <Dialog
+                    open={props.edicaoUDialog}
+                    onClose={props.handleEdicaoUClose}
+                    fullWidth>
+                    <DialogTitle>Edição de Usuário</DialogTitle>
+                    {props.edicaoStep === steps.length ? (
                         <div>
-                            {getStepContent(props.edicaoStep, props)}
-                            <div>
-                                <Stepper
-                                    activeStep={props.edicaoStep} alternativeLabel>
-                                    {steps.map(label => {
-                                        return (
-                                            <Step key={label}>
-                                                <StepLabel>{label}</StepLabel>
-                                            </Step>
-                                        )
-                                    })}
-                                </Stepper>
-                                <Button
-                                    disabled={props.edicaoStep === 0}
-                                    onClick={props.handleEdicaoBack}
-                                    className={classes.button}
-                                >
-                                    Voltar
-                            </Button>
-                                <Button className={classes.button} variant='raised' color='primary' onClick={props.handleEdicaoNext}>
-                                    {props.edicaStem === steps.length - 1 ? 'Finalizar' : 'Próximo'}
-                                </Button>
-                            </div>
+                            <Stepper
+                                activeStep={props.edicaoStep} alternativeLabel>
+                                {steps.map(label => {
+                                    return (
+                                        <Step key={label}>
+                                            <StepLabel>{label}</StepLabel>
+                                        </Step>
+                                    )
+                                })}
+                            </Stepper>
+                            <Button onClick={props.handleClickEdicao} className={classes.button}>
+                                Editar
+                        </Button>
                         </div>
-                    )}
-            </Dialog>
-        </div>
-    )
+                    ) : (
+                            <div>
+                                {getStepContent(props.edicaoStep, props)}
+                                <div>
+                                    <Stepper
+                                        activeStep={props.edicaoStep} alternativeLabel>
+                                        {steps.map(label => {
+                                            return (
+                                                <Step key={label}>
+                                                    <StepLabel>{label}</StepLabel>
+                                                </Step>
+                                            )
+                                        })}
+                                    </Stepper>
+                                    <Button
+                                        disabled={props.edicaoStep === 0}
+                                        onClick={props.handleEdicaoBack}
+                                        className={classes.button}
+                                    >
+                                        Voltar
+                            </Button>
+                                    <Button className={classes.button} variant='raised' color='primary' onClick={props.handleEdicaoNext}>
+                                        {props.edicaStem === steps.length - 1 ? 'Finalizar' : 'Próximo'}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                </Dialog>
+            </div>
+        )
+    }
 }
 
 
