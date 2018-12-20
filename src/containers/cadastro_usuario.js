@@ -29,22 +29,10 @@ class CadastroDialog extends React.Component {
         cadEmail: '',
         cadNome: '',
         cadDepartamento: 0,
-        cadTipoUsuario: 0,
+        cadTipoUsuario: 2,
         cadRamal: '',
         cadValue: 0,
         cadAdminCheck: false,
-    }
-    handleCadastroU = () => {
-        console.log(this.state.cadTipoUsuario);
-        this.dataCall('POST', 'http://localhost:90/insertUsu', '{"usuario": "' + this.state.cadNome + '", "email": "' + this.state.cadEmail + '", "ramal": "' + this.state.cadRamal + '", "tipoUsuario": "' + this.state.cadTipoUsuario + '", "departamento": "' + this.state.cadDepartamento + '"}')
-        this.setState({
-            cadActiveStep: 0,
-            cadNome: '',
-            cadEmail: '',
-            cadAdminCheck: false,
-            cadRamal: '',
-            cadDepartamento: 0
-        })
     }
     handleCadastroNomeChange = (event) => {
         this.setState({ cadNome: event.target.value })
@@ -61,27 +49,32 @@ class CadastroDialog extends React.Component {
     handleCadastroAdminChange = (event) => {
         if (event.target.checked) this.setState({ cadTipoUsuario: 1 })
         else this.setState({ cadTipoUsuario: 2 })
-        console.log("object");
         this.setState({ cadAdminCheck: event.target.checked })
     }
-    //Cadastro Usuario
-    handleEdicaoUOpen = () => {
-        this.setState({ edicaoUDialog: true })
-    }
-    handleEdicaoUClose = () => {
-        this.setState({ edicaoUDialog: false })
-    }
-    handleCadastroU = (user) => {
-        console.log(this.state.cadTipoUsuario);
-        this.props.dataCall('POST', 'http://localhost:90/insertUsu', '{"usuario": "' + user.cadNome + '", "email": "' + user.cadEmail + '", "ramal": "' + user.cadRamal + '", "tipoUsuario": "' + user.cadTipoUsuario + '", "departamento": "' + user.cadDepartamento + '"}')
-        this.setState({
-            cadActiveStep: 0,
-            cadNome: '',
-            cadEmail: '',
-            cadAdminCheck: false,
-            cadRamal: '',
-            cadDepartamento: 0
-        })
+    handleCadastroU = () => {
+        let check = this.props.dataCall('POST', 'http://localhost:90/validaUsuario', '{"email": "' + this.state.cadEmail + '"}')
+        if (check.length === 0) {
+            let response = JSON.parse(this.props.dataCall('POST', 'http://localhost:90/insertUsu', '{"usuario": "' + this.state.cadNome + '", "email": "' + this.state.cadEmail + '", "ramal": "' + this.state.cadRamal + '", "tipoUsuario": "' + this.state.cadTipoUsuario + '", "departamento": "' + this.state.cadDepartamento + '"}'))
+            if (response === 1) {
+                this.setState({
+                    cadActiveStep: 0,
+                    cadNome: '',
+                    cadEmail: '',
+                    cadAdminCheck: false,
+                    cadRamal: '',
+                    cadDepartamento: 0
+                })
+                this.props.handleSnackOpen('Cadastro efetuado com sucesso')
+                this.props.handleCadastroUClose()
+            }
+            else {
+                this.props.handleSnackOpen('Ocorreu um erro, tente novamente mais tarde')
+            }
+        }
+        else{
+            this.props.handleSnackOpen('Usuário já cadastrado')
+        }
+
     }
     render() {
         const { classes } = this.props
@@ -97,8 +90,8 @@ class CadastroDialog extends React.Component {
                             id='nome_usuario'
                             label='Nome do Usuário'
                             placeholder='Manoel Bandeira'
-                            value={this.props.cadNome}
-                            onChange={this.props.handleCadastroNomeChange}
+                            value={this.state.cadNome}
+                            onChange={this.handleCadastroNomeChange}
                             margin='normal'
                             required
                             style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
@@ -107,8 +100,8 @@ class CadastroDialog extends React.Component {
                             id='email_usuario'
                             label='E-mail do Usuário'
                             placeholder='manoel_bandeira@alispec.com.br'
-                            value={this.props.cadEmail}
-                            onChange={this.props.handleCadastroEmailChange}
+                            value={this.state.cadEmail}
+                            onChange={this.handleCadastroEmailChange}
                             margin='normal'
                             required
                             style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
@@ -117,15 +110,15 @@ class CadastroDialog extends React.Component {
                             id='ramal_usuario'
                             label='Ramal do Usuário'
                             placeholder='1234 '
-                            value={this.props.cadRamal}
-                            onChange={this.props.handleCadastroRamalChange}
+                            value={this.state.cadRamal}
+                            onChange={this.handleCadastroRamalChange}
                             margin='normal'
                             style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
                         />
                         <InputLabel required style={{ marginLeft: '4%', marginBottom: '4%', width: '50%' }}>Qual o departamento desse Usuário?</InputLabel>
                         <Select
-                            value={this.props.cadDepartamento}
-                            onChange={this.props.handleCadastroDepartamentoChange}
+                            value={this.state.cadDepartamento}
+                            onChange={this.handleCadastroDepartamentoChange}
                             style={{ marginLeft: '4%', marginBottom: '4%', width: '40%' }}
                         >
                             <MenuItem value={0}>Departamento</MenuItem>
@@ -144,15 +137,15 @@ class CadastroDialog extends React.Component {
                         <Typography style={{ marginLeft: '4%', marginBottom: '2%', width: '80%' }} variant={'body2'} color={'inherit'}>{this.props.cadNome} será um(a) administrador(a)?</Typography>
                         <InputLabel style={{ marginLeft: '4%', marginBottom: '2%', width: '80%' }}>Sim</InputLabel>
                         <Checkbox
-                            checked={this.props.cadAdminCheck}
-                            onClick={this.props.handleCadastroAdminChange}
+                            checked={this.state.cadAdminCheck}
+                            onClick={this.handleCadastroAdminChange}
                             color={'primary'}
                             value='0'
                         />
 
                     </div>
                     {<br />}
-                    <Button onClick={this.props.handleCadastroU} color='primary' size='medium' variant='raised' style={{ margin: '0 auto', marginBottom: '4%', width: '20%' }}>
+                    <Button onClick={this.handleCadastroU} color='primary' size='medium' variant='raised' style={{ margin: '0 auto', marginBottom: '4%', width: '20%' }}>
                         Cadastrar
                     </Button>
                 </Dialog>

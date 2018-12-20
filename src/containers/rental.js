@@ -49,7 +49,6 @@ class RentalDialog extends React.Component {
         this.setState({ Slots: Array(25).fill(null) })
     }
     fillSlots = (loc) => {
-        console.log(loc)
         let now = new Date(Date.now())
         let hour = now.getHours()
         let Slot = this.state.Slots
@@ -260,20 +259,6 @@ class RentalDialog extends React.Component {
         }
         return components
     }
-    handleRentDialogClose = () => {
-        this.setState({
-            activeStep: 0,
-            inicioSelect: 0,
-            duracaoSelect: 0,
-            dataI: new Date(),
-            inicio: new Date(),
-            termino: new Date(),
-            duracao: 0,
-            motivo: '',
-            motorista: ''
-        })
-    }
-
     handleRentalDataChange = (date) => {
         console.log(date)
         this.setState({ dataI: date })
@@ -288,7 +273,6 @@ class RentalDialog extends React.Component {
     handleRentalInicioChange = (event) => {
         let inicio = new Date(this.state.dataI.toDateString() + ' ' + event.target.value)
         this.setState({ inicio: inicio, inicioSelect: event.target.value })
-        console.log(this.state.inicio)
     }
     handleRentalDuracaoChange = (event) => {
         let termino = new Date(Date.parse(this.state.inicio) + event.target.value)
@@ -314,16 +298,31 @@ class RentalDialog extends React.Component {
     handleClickRental = () => {
         let termino = new Date(Date.parse(this.state.inicio) + this.state.duracao)
         let dataT = termino.toLocaleDateString('en-US')
-        let inicio = new Date(this.state.inicio.getTime() - this.state.inicio.getTimezoneOffset() * 60000)
         let duracao = this.state.duracao / 3600000
         if (duracao === 0.5) duracao = '00:30:00'
         else if (duracao === 1) duracao = '01:00:00'
         else if (duracao === 1.5) duracao = '01:30:00'
-        else if (duracao === 2) duracao = '02:00:00'
+        else if (duracao === 2) duracao = '02:00:00'    
         else if (duracao === 6) duracao = '06:00:00'
         else if (duracao === 8) duracao = '08:00:00'
         else if (duracao === 12) duracao = '12:00:00'
-        let response = JSON.parse(this.props.dataCall('POST', 'http://localhost:90/insertRental', '{"duracao": "' + duracao + '", "dataI": "' + this.state.dataI.toJSON() + '", "dataT": "' + dataT + '" , "inicio": "' + inicio.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "termino": "' + termino.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "userId": ' + this.props.userId + ', "veiId": ' + this.props.carId + ', "motivo": "' + this.state.motivo + '", "motorista": "' + this.state.motorista + '"}'))
+        
+        let rental = new Object()
+        rental.duracao = duracao
+        rental.dataI = this.state.dataI.toJSON()
+        rental.dataT = dataT
+        rental.inicio = this.state.inicio.toJSON().slice(0, 19).replace('T', ' ')
+        rental.termino = termino.toJSON().slice(0, 19).replace('T', ' ')
+        rental.userId = this.props.userId
+        rental.veiId = this.props.carId
+        rental.motivo = this.state.motivo
+        rental.motorista = this.state.motorista
+        let debug = new Object()
+        debug.inicio = rental.inicio.toString()
+        debug.duracao = this.state.duracao
+        debug.termino = rental.termino.toString()
+        console.table(debug)
+        let response = JSON.parse(this.props.dataCall('POST', 'http://localhost:90/insertRental', JSON.stringify(rental)))
         if (response === 1) {
             this.props.handleSnackOpen("Aluguel efetuado com sucesso")
             this.setState({ rentalDialog: false, activeStep: 0, inicioSelect: 0, duracaoSelect: 0, })
@@ -342,7 +341,6 @@ class RentalDialog extends React.Component {
                 let day = this.state.dataI.getDate()
                 let year = this.state.dataI.getFullYear()
                 let dateI = [year, month, day].join('/')
-                console.log(dateI)
                 locacao = this.props.dataCall('POST', 'http://localhost:90/confirmedRental', '{"dataI": "' + dateI + '"}')
                 return (
                     <div>

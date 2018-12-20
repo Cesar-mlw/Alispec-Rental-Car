@@ -4,7 +4,7 @@ import { DirectionsCar, Receipt, Close, AccountCircle, Storage } from '@material
 import 'typeface-roboto'
 import Login from './login'
 import Cloudinary from 'cloudinary'
-import Rental from '../rental'
+import Rental from './rental'
 import Car from './car'
 import CadastroU from './cadastro_usuario'
 import EdicaoU from './editar_usuario'
@@ -88,14 +88,10 @@ export default class Nav extends React.Component {
     }
     //Login
     handleCadastroUOpen = () => {
-        this.setState({
-            cadastroUDialog: true
-        })
+        this.setState({cadastroUDialog: true})
     }
     handleCadastroUClose = () => {
-        this.setState({
-            cadastroUDialog: false,
-        })
+        this.setState({cadastroUDialog: false,})
     }
     //Cadastro Usuario
     handleEdicaoUOpen = () => {
@@ -237,30 +233,22 @@ export default class Nav extends React.Component {
                 {this.state.cadastroUDialog && (
                     <CadastroU
                         cadastroUDialog={this.state.cadastroUDialog}
-                        cadEmail={this.state.cadEmail}
-                        cadDepartamento={this.state.cadDepartamento}
-                        cadNome={this.state.cadNome}
-                        cadAdminCheck={this.state.cadAdminCheck}
-                        cadTipoUsuario={this.state.cadTipoUsuario}
                         //states
                         handleCadastroUOpen={this.handleCadastroUOpen}
                         handleCadastroUClose={this.handleCadastroUClose}
-                        handleCadastroU={this.handleCadastroU}
-                        dataCall={this.dataCall}
-                        handleCadastroNomeChange={this.handleCadastroNomeChange}
-                        handleCadastroEmailChange={this.handleCadastroEmailChange}
-                        handleCadastroDepartamentoChange={this.handleCadastroDepartamentoChange}
-                        handleCadastroTipoUsuarioChange={this.handleCadastroTipoUsuarioChange}
-                        handleCadastroRamalChange={this.handleCadastroRamalChange}
-                        handleCadastroAdminChange={this.handleCadastroAdminChange}
-                    //functions
+                        dataCall = {this.dataCall}
+                        handleSnackOpen = {this.handleSnackOpen}
+                        handleSnackClose = {this.handleSnackClose}
+                        //functions
                     />
                 )}
                 {/* CADASTRO USUARIO */}
                 {this.state.edicaoUDialog && (
                     <EdicaoU
+                        edicaoUDialog = {this.state.edicaoUDialog}
                         dataCall={this.dataCall}
                         handleEdicaoUClose={this.handleEdicaoUClose}
+                        handleSnackOpen = {this.handleSnackOpen}
                     />
                 )}
                 {/* EDICAO USUARIO */}
