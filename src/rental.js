@@ -49,6 +49,7 @@ class RentalDialog extends React.Component {
         this.setState({ Slots: Array(25).fill(null) })
     }
     fillSlots = (loc) => {
+        console.log(loc)
         let now = new Date(Date.now())
         let hour = now.getHours()
         let Slot = this.state.Slots
@@ -322,11 +323,11 @@ class RentalDialog extends React.Component {
         else if (duracao === 6) duracao = '06:00:00'
         else if (duracao === 8) duracao = '08:00:00'
         else if (duracao === 12) duracao = '12:00:00'
-        console.log(this.props.userId)
         let response = JSON.parse(this.props.dataCall('POST', 'http://localhost:90/insertRental', '{"duracao": "' + duracao + '", "dataI": "' + this.state.dataI.toJSON() + '", "dataT": "' + dataT + '" , "inicio": "' + inicio.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "termino": "' + termino.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "userId": ' + this.props.userId + ', "veiId": ' + this.props.carId + ', "motivo": "' + this.state.motivo + '", "motorista": "' + this.state.motorista + '"}'))
         if (response === 1) {
             this.props.handleSnackOpen("Aluguel efetuado com sucesso")
             this.setState({ rentalDialog: false, activeStep: 0, inicioSelect: 0, duracaoSelect: 0, })
+            this.props.handleRentalDialogClose()
         }
         else {
             this.props.handleSnackOpen("Ocorreu um Erro, tente novamente")
@@ -337,8 +338,12 @@ class RentalDialog extends React.Component {
     getStepContent = (stepIndex, props) => {
         switch (stepIndex) {
             case 0:
-                let dateI = this.state.dataI.toLocaleDateString('en-GB')
-                locacao = props.dataCall('POST', 'http://localhost:90/confirmedRental', '{"dataI": "' + dateI + '"}')
+                let month = this.state.dataI.getMonth() + 1
+                let day = this.state.dataI.getDate()
+                let year = this.state.dataI.getFullYear()
+                let dateI = [year, month, day].join('/')
+                console.log(dateI)
+                locacao = this.props.dataCall('POST', 'http://localhost:90/confirmedRental', '{"dataI": "' + dateI + '"}')
                 return (
                     <div>
                         <Typography style={{ marginLeft: '4%', marginBottom: '4%', width: '90%' }} align={'center'} variant={'title'} color={'inherit'}>Selecione os horários!</Typography>
