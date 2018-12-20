@@ -31,94 +31,22 @@ const styles = {
 const getSteps = () => {
     return ['Horários disponíveis', 'Informações finais e confirmação']
 }
-const getStepContent = (stepIndex, props, state) => {
-    switch (stepIndex) {
-        case 0:
-            let dateI = this.state.dataI.toLocaleDateString('en-GB')
-            locacao = props.dataCall('POST', 'http://localhost:90/confirmedRental', '{"dataI": "' + dateI + '"}')
-
-            return (
-                <div>
-                    <Typography style={{ marginLeft: '4%', marginBottom: '4%', width: '90%' }} align={'center'} variant={'title'} color={'inherit'}>Selecione os horários!</Typography>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils} locale={BR}>
-                        <DatePicker
-                            label="Quando você vai precisar dele?"
-                            format="DD/MM/YYYY"
-                            placeholder="25/03/2018"
-                            value={this.state.dataI}
-                            onChange={this.handleRentalDataChange}
-                            disableOpenOnEnter
-                            disablePast
-                            style={{ marginLeft: '4%', marginBottom: '4%', width: '90%' }}
-                            animateYearScrolling={false}
-                        />
-                        <div style={{ alignContent: 'center' }}>
-                            <InputLabel style={{ marginLeft: '4%', marginBottom: '4%', width: '90%' }}>A que horas?</InputLabel>
-                            <Select
-                                value={state.inicioSelect}
-                                onChange={this.handleRentalInicioChange}
-                                style={{ marginLeft: '4%', marginBottom: '4%', width: '30%' }}
-                            >
-                                <MenuItem value={0}><em>hh:mm</em></MenuItem>
-                                {this.sendAvailableHours(locacao)}
-                            </Select>
-                        </div>
-                        <div style={{ alignContent: 'center', flex: 'wrap' }}>
-                            <InputLabel style={{ marginLeft: '4%', marginBottom: '4%', width: '90%' }}>Por Quanto tempo?</InputLabel>
-                            <Select
-                                value={this.state.duracaoSelect}
-                                onChange={this.handleRentalDuracaoChange}
-                                style={{ marginLeft: '4%', marginBottom: '4%', width: '30%' }}
-                            >
-                                <MenuItem value={0}><em>None</em></MenuItem>
-                                {this.sendAvailableDuration()}
-                            </Select>
-                        </div>
-                    </MuiPickersUtilsProvider>
-                </div>
-            )
-
-        case 1:
-            return (
-                <div>
-                    <Typography align={'center'} variant={'title'} color={'inherit'}>Confirme seus dados!</Typography>
-
-                    <TextField
-                        id='motorista_locacao'
-                        label='Quem será o motorista?'
-                        placeholder='Fernando Pessoa'
-                        value={this.state.motorista}
-                        onChange={this.state.handleMotoristaChange}
-                        margin='normal'
-                        style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
-                    />
-                    <TextField
-                        id='motivo_locacao'
-                        label='Motivo do aluguel.'
-                        multiline
-                        placeholder='Buscar peças na Maré'
-                        value={this.state.motivo}
-                        onChange={this.handleMotivoChange}
-                        margin='normal'
-                        style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
-                    />
-                </div>
-            )
-        default:
-            return 'Wrong StepIndex - Contact Cesar and ask him to fix it (11)99488-1864, or fix it yourself :3'
-    }
-}
 class RentalDialog extends React.Component {
     state = {
-            activeStep: 0,
-            inicioSelect: 0,
-            duracaoSelect: 0,
-            dataI: new Date(),
-            inicio: new Date(),
-            termino: new Date(),
-            duracao: 0,
-            motivo: '',
-            motorista: ''
+        activeStep: 0,
+        inicioSelect: 0,
+        duracaoSelect: 0,
+        dataI: new Date(),
+        inicio: new Date(),
+        termino: new Date(),
+        duracao: 0,
+        motivo: '',
+        motorista: '',
+        Slots: Array(25).fill(null)
+    }
+    
+    cleanSlots = () => {
+        this.setState({ Slots: Array(25).fill(null) })
     }
     fillSlots = (loc) => {
         let now = new Date(Date.now())
@@ -346,6 +274,7 @@ class RentalDialog extends React.Component {
     }
 
     handleRentalDataChange = (date) => {
+        console.log(date)
         this.setState({ dataI: date })
         this.cleanSlots()
     }
@@ -358,6 +287,7 @@ class RentalDialog extends React.Component {
     handleRentalInicioChange = (event) => {
         let inicio = new Date(this.state.dataI.toDateString() + ' ' + event.target.value)
         this.setState({ inicio: inicio, inicioSelect: event.target.value })
+        console.log(this.state.inicio)
     }
     handleRentalDuracaoChange = (event) => {
         let termino = new Date(Date.parse(this.state.inicio) + event.target.value)
@@ -368,13 +298,15 @@ class RentalDialog extends React.Component {
         this.setState({ activeStep: activeStep - 1 })
     }
 
-    handleRentalNext = () => {
+    handleRentalNext = () => {//ADD SNACK HERE
         const { activeStep } = this.state
         if (activeStep === 0 && (this.state.inicioSelect === 0 || this.state.duracaoSelect === 0)) {
-            this.setState({ activeStep: 0, snackOpen: true, snackMessage: 'Por favor, preencha todos os campos antes de proseguir.' })
+            this.props.handleSnackOpen("Por favor, preencha todos os campos antes de proseguir.")
+            this.setState({ activeStep: 0})
         }
         else if (activeStep === 1 && (this.state.motivo === '' || this.state.motorista === '')) {
-            this.setState({ activeStep: 1, snackOpen: true, snackMessage: 'Por favor, preencha todos os campos antes de proseguir.' })
+            this.props.handleSnackOpen("Por favor, preencha todos os campos antes de proseguir.")
+            this.setState({ activeStep: 1})
         }
         else this.setState({ activeStep: activeStep + 1 })
     }
@@ -390,130 +322,208 @@ class RentalDialog extends React.Component {
         else if (duracao === 6) duracao = '06:00:00'
         else if (duracao === 8) duracao = '08:00:00'
         else if (duracao === 12) duracao = '12:00:00'
+        console.log(this.props.userId)
         let response = JSON.parse(this.props.dataCall('POST', 'http://localhost:90/insertRental', '{"duracao": "' + duracao + '", "dataI": "' + this.state.dataI.toJSON() + '", "dataT": "' + dataT + '" , "inicio": "' + inicio.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "termino": "' + termino.toISOString().replace(/T/, ' ').replace(/\..+/, '') + '", "userId": ' + this.props.userId + ', "veiId": ' + this.props.carId + ', "motivo": "' + this.state.motivo + '", "motorista": "' + this.state.motorista + '"}'))
-        if(response === 1) {
-            this.props.handleSnackOpen("Aluguel efetuado com sucesso") 
-            this.setState({ rentalDialog: false, activeStep: 0, inicioSelect: 0, duracaoSelect: 0,})
+        if (response === 1) {
+            this.props.handleSnackOpen("Aluguel efetuado com sucesso")
+            this.setState({ rentalDialog: false, activeStep: 0, inicioSelect: 0, duracaoSelect: 0, })
         }
         else {
             this.props.handleSnackOpen("Ocorreu um Erro, tente novamente")
-            this.setState({ activeStep: 0})
+            this.setState({ activeStep: 0 })
         }// add snack error
 
     }
-render(){
-    const steps = getSteps()
-    const { activeStep } = this.state.activeStep
-    const { classes } = this.props
-    return (
-        <div className={classes.root}>
-            <Dialog
-                open={this.props.rentalDialog}
-                onClose={this.handleRentalDialogClose}
-                fullWidth>
-                <DialogTitle>Rental</DialogTitle>
-                {this.state.activeStep === steps.length ? (
+    getStepContent = (stepIndex, props) => {
+        switch (stepIndex) {
+            case 0:
+                let dateI = this.state.dataI.toLocaleDateString('en-GB')
+                locacao = props.dataCall('POST', 'http://localhost:90/confirmedRental', '{"dataI": "' + dateI + '"}')
+                return (
                     <div>
-                        <Typography align={'center'} variant={'title'} color={'inherit'}>
-                            Resumo do Aluguel
-                        </Typography>
-                        <div>
-                            <TextField
-                                id='carro'
-                                label='Motorista'
-                                defaultValue={this.state.motorista}
-                                margin='normal'
-                                style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
+                        <Typography style={{ marginLeft: '4%', marginBottom: '4%', width: '90%' }} align={'center'} variant={'title'} color={'inherit'}>Selecione os horários!</Typography>
+                        <MuiPickersUtilsProvider utils={DateFnsUtils} locale={BR}>
+                            <DatePicker
+                                label="Quando você vai precisar dele?"
+                                format="DD/MM/YYYY"
+                                placeholder="25/03/2018"
+                                value={this.state.dataI}
+                                onChange={this.handleRentalDataChange}
+                                disableOpenOnEnter
+                                disablePast
+                                style={{ marginLeft: '4%', marginBottom: '4%', width: '90%' }}
+                                animateYearScrolling={false}
                             />
-                            <TextField
-                                id='carro'
-                                label='Veículo'
-                                defaultValue={this.state.carNome}
-                                margin='normal'
-                                style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            />
-                            <TextField
-                                id='data'
-                                label='Data'
-                                defaultValue={this.state.dataI.toLocaleDateString('en-GB')}
-                                margin='normal'
-                                style={{ marginLeft: '4%', marginBottom: '2%', width: '30%' }}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            />
-                            <TextField
-                                id='horario_inicio'
-                                label='Início'
-                                defaultValue={this.state.inicio.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                margin='normal'
-                                style={{ marginLeft: '4%', marginBottom: '2%', width: '25%' }}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            />
-                            <TextField
-                                id='horario_inicio'
-                                label='Término'
-                                defaultValue={this.state.termino.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                margin='normal'
-                                style={{ marginLeft: '4%', marginBottom: '2%', width: '25%' }}
-                                InputProps={{
-                                    readOnly: true,
-                                }}
-                            />
-                        </div>
-                        <Stepper
-                            activeStep={this.state.activeStep} alternativeLabel>
-                            {steps.map(label => {
-                                return (
-                                    <Step key={label}>
-                                        <StepLabel>{label}</StepLabel>
-                                    </Step>
-                                )
-                            })}
-                        </Stepper>
-                        <Button onClick={this.handleClickRental} className={classes.button}>
-                            Alugar
-                        </Button>
-                    </div>
-                ) : (
-                        <div>
-                            {getStepContent(this.state.activeStep, this.props, this.state)}
-                            <div>
-                                <Stepper
-                                    activeStep={this.state.activeStep} alternativeLabel>
-                                    {steps.map(label => {
-                                        return (
-                                            <Step key={label}>
-                                                <StepLabel>{label}</StepLabel>
-                                            </Step>
-                                        )
-                                    })}
-                                </Stepper>
-                                <Button
-                                    disabled={this.state.activeStep === 0}
-                                    onClick={this.handleRentalBack}
-                                    className={classes.button}
+                            <div style={{ alignContent: 'center' }}>
+                                <InputLabel style={{ marginLeft: '4%', marginBottom: '4%', width: '90%' }}>A que horas?</InputLabel>
+                                <Select
+                                    value={this.state.inicioSelect}
+                                    onChange={this.handleRentalInicioChange}
+                                    style={{ marginLeft: '4%', marginBottom: '4%', width: '30%' }}
                                 >
-                                    Voltar
-                            </Button>
-                                <Button className={classes.button} variant='raised' color='primary' onClick={this.handleRentalNext}>
-                                    {activeStep === steps.length - 1 ? 'Finalizar' : 'Próximo'}
-                                </Button>
+                                    <MenuItem value={0}><em>hh:mm</em></MenuItem>
+                                    {this.sendAvailableHours(locacao)}
+                                </Select>
                             </div>
+                            <div style={{ alignContent: 'center', flex: 'wrap' }}>
+                                <InputLabel style={{ marginLeft: '4%', marginBottom: '4%', width: '90%' }}>Por Quanto tempo?</InputLabel>
+                                <Select
+                                    value={this.state.duracaoSelect}
+                                    onChange={this.handleRentalDuracaoChange}
+                                    style={{ marginLeft: '4%', marginBottom: '4%', width: '30%' }}
+                                >
+                                    <MenuItem value={0}><em>None</em></MenuItem>
+                                    {this.sendAvailableDuration()}
+                                </Select>
+                            </div>
+                        </MuiPickersUtilsProvider>
+                    </div>
+                )
+
+            case 1:
+                return (
+                    <div>
+                        <Typography align={'center'} variant={'title'} color={'inherit'}>Confirme seus dados!</Typography>
+
+                        <TextField
+                            id='motorista_locacao'
+                            label='Quem será o motorista?'
+                            placeholder='Fernando Pessoa'
+                            value={this.state.motorista}
+                            onChange={this.handleMotoristaChange}
+                            margin='normal'
+                            style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
+                        />
+                        <TextField
+                            id='motivo_locacao'
+                            label='Motivo do aluguel.'
+                            multiline
+                            placeholder='Buscar peças na Maré'
+                            value={this.state.motivo}
+                            onChange={this.handleMotivoChange}
+                            margin='normal'
+                            style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
+                        />
+                    </div>
+                )
+            default:
+                return 'Wrong StepIndex - Contact Cesar and ask him to fix it +55(11)99488-1864, or fix it yourself :3'
+        }
+    }
+    render() {
+        const steps = getSteps()
+        const { activeStep } = this.state.activeStep
+        const { classes } = this.props
+        return (
+            <div className={classes.root}>
+                <Dialog
+                    open={this.props.rentalDialog}
+                    onClose={this.props.handleRentalDialogClose}
+                    fullWidth
+                    onBackdropClick={this.props.handleRentDialogClose}>
+                    <DialogTitle>Rental</DialogTitle>
+                    {this.state.activeStep === steps.length ? (
+                        <div>
+                            <Typography align={'center'} variant={'title'} color={'inherit'}>
+                                Resumo do Aluguel
+                        </Typography>
+                            <div>
+                                <TextField
+                                    id='carro'
+                                    label='Motorista'
+                                    defaultValue={this.state.motorista}
+                                    margin='normal'
+                                    style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                                <TextField
+                                    id='carro'
+                                    label='Veículo'
+                                    defaultValue={this.props.carName}
+                                    margin='normal'
+                                    style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                                <TextField
+                                    id='data'
+                                    label='Data'
+                                    defaultValue={this.state.dataI.toLocaleDateString('en-GB')}
+                                    margin='normal'
+                                    style={{ marginLeft: '4%', marginBottom: '2%', width: '30%' }}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                                <TextField
+                                    id='horario_inicio'
+                                    label='Início'
+                                    defaultValue={this.state.inicio.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                    margin='normal'
+                                    style={{ marginLeft: '4%', marginBottom: '2%', width: '25%' }}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                                <TextField
+                                    id='horario_inicio'
+                                    label='Término'
+                                    defaultValue={this.state.termino.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                    margin='normal'
+                                    style={{ marginLeft: '4%', marginBottom: '2%', width: '25%' }}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                />
+                            </div>
+                            <Stepper
+                                activeStep={this.state.activeStep} alternativeLabel>
+                                {steps.map(label => {
+                                    return (
+                                        <Step key={label}>
+                                            <StepLabel>{label}</StepLabel>
+                                        </Step>
+                                    )
+                                })}
+                            </Stepper>
+                            <Button onClick={this.handleClickRental} className={classes.button}>
+                                Alugar
+                        </Button>
                         </div>
-                    )}
-            </Dialog>
-        </div>
-    )
-}
+                    ) : (
+                            <div>
+                                {this.getStepContent(this.state.activeStep, this.props, this.state)}
+                                <div>
+                                    <Stepper
+                                        activeStep={this.state.activeStep} alternativeLabel>
+                                        {steps.map(label => {
+                                            return (
+                                                <Step key={label}>
+                                                    <StepLabel>{label}</StepLabel>
+                                                </Step>
+                                            )
+                                        })}
+                                    </Stepper>
+                                    <Button
+                                        disabled={this.state.activeStep === 0}
+                                        onClick={this.handleRentalBack}
+                                        className={classes.button}
+                                    >
+                                        Voltar
+                            </Button>
+                                    <Button className={classes.button} variant='raised' color='primary' onClick={this.handleRentalNext}>
+                                        {activeStep === steps.length - 1 ? 'Finalizar' : 'Próximo'}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                </Dialog>
+            </div>
+        )
+    }
 }
 
 

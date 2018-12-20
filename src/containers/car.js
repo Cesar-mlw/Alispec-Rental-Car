@@ -21,10 +21,10 @@ class CarCard extends React.Component {
                     <CardMedia
                         className={classes.media}
                         image={this.props.image}
-                        title={this.props.name} />
+                        title={this.props.carName} />
                     <CardContent>
                         <Typography gutterBottom variant="headline" component="h2">
-                            {this.props.name}
+                            {this.props.carName}
                         </Typography>
                         <Typography component='p'>
                             {this.props.desc}
@@ -34,7 +34,7 @@ class CarCard extends React.Component {
                         </Typography>
                     </CardContent>
                     <CardActions>
-                        <Button size="small" color="primary" onClick={() => this.props.handleRentalDialogOpen(this.props.carId, this.props.name)}>
+                        <Button size="small" color="primary" onClick={() => this.props.handleRentalDialogOpen(this.props.carId, this.props.carName)}>
                             Reservar
                         </Button>
                     </CardActions>

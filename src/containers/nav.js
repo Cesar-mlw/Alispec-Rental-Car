@@ -34,7 +34,7 @@ export default class Nav extends React.Component {
         //value to control top tabs
         auth: false,
         email: '',
-        userId: 0,
+        userId: 1,
         admin: true, //CHANGE THIS TO FALSE BEFORE SHIPPING IT OUT
         menu: null,
         loginDialog: false, //CHANGE THIS TO TRUE BEFORE SHIPPING IT OUT
@@ -84,7 +84,7 @@ export default class Nav extends React.Component {
         this.setState({rentalDialog: true, carId: carId, carName: name})
     }
     handleRentalDialogClose = () => {
-        this.setState({rentalDialog: false, carId: null, carName: false})
+        this.setState({rentalDialog: false, carId: null, carName: null})
     }
     //Login
     handleCadastroUOpen = () => {
@@ -119,8 +119,9 @@ export default class Nav extends React.Component {
         for (let i in validate.car) {
             let image = validate.car[i].imgUrl_veiculo
             components[i] = (<Grid item key={i}><Car
-                handleRentalDialogOpen={this.handleRentDialogOpen}
-                state={this.state} name={validate.car[i].nome_veiculo}
+                handleRentalDialogOpen = {this.handleRentalDialogOpen}
+                handleRentalDialogClose =  {this.handleRentalDialogClose}
+                state={this.state} carName={validate.car[i].nome_veiculo}
                 desc={validate.car[i].desc_veiculo} key={i} ano={validate.car[i].ano_veiculo} carId={validate.car[i].id_veiculo}
                 image={Cloudinary.url(image)} /></Grid>)
         }
@@ -134,9 +135,6 @@ export default class Nav extends React.Component {
     handleSnackClose = (reason) => {
         if (reason === 'clickaway') return
         this.setState({ snackOpen: false })
-    }
-    cleanSlots = () => {
-        this.setState({ Slots: Array(25).fill(null) })
     }
     dataCall = (method, url, data) => {
         let call = new XMLHttpRequest()
@@ -227,8 +225,9 @@ export default class Nav extends React.Component {
                 {/*LOGIN*/}
                 {this.state.rentalDialog && <Rental
                     rentalDialog = {this.state.rentalDialog}
-                    carId = {this.carId}
-                    carName = {this.carName}
+                    handleRentalDialogClose = {this.handleRentalDialogClose}
+                    carId = {this.state.carId}
+                    carName = {this.state.carName}
                     dataCall={this.dataCall}
                     handleSnackOpen={this.handleSnackOpen}
                     handleSnackClose={this.handleSnackClose}
