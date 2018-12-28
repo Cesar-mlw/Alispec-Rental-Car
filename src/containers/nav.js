@@ -8,6 +8,7 @@ import Rental from './rental'
 import Car from './car'
 import CadastroU from './cadastro_usuario'
 import EdicaoU from './editar_usuario'
+import MyRental from './myRentals'
 Cloudinary.config({
     cloud_name: '#Input with cloud name - present in todo.txt',
     api_key: '#Input with api_key - present in todo.txt',
@@ -81,17 +82,17 @@ export default class Nav extends React.Component {
         }
     }
     handleRentalDialogOpen = (carId, name) => {
-        this.setState({rentalDialog: true, carId: carId, carName: name})
+        this.setState({ rentalDialog: true, carId: carId, carName: name })
     }
     handleRentalDialogClose = () => {
-        this.setState({rentalDialog: false, carId: null, carName: null})
+        this.setState({ rentalDialog: false, carId: null, carName: null })
     }
     //Login
     handleCadastroUOpen = () => {
-        this.setState({cadastroUDialog: true})
+        this.setState({ cadastroUDialog: true })
     }
     handleCadastroUClose = () => {
-        this.setState({cadastroUDialog: false,})
+        this.setState({ cadastroUDialog: false, })
     }
     //Cadastro Usuario
     handleEdicaoUOpen = () => {
@@ -115,8 +116,8 @@ export default class Nav extends React.Component {
         for (let i in validate.car) {
             let image = validate.car[i].imgUrl_veiculo
             components[i] = (<Grid item key={i}><Car
-                handleRentalDialogOpen = {this.handleRentalDialogOpen}
-                handleRentalDialogClose =  {this.handleRentalDialogClose}
+                handleRentalDialogOpen={this.handleRentalDialogOpen}
+                handleRentalDialogClose={this.handleRentalDialogClose}
                 state={this.state} carName={validate.car[i].nome_veiculo}
                 desc={validate.car[i].desc_veiculo} key={i} ano={validate.car[i].ano_veiculo} carId={validate.car[i].id_veiculo}
                 image={Cloudinary.url(image)} /></Grid>)
@@ -125,6 +126,10 @@ export default class Nav extends React.Component {
 
     }
     //Car Card Handler
+    sendMyRentals = () => {
+        return (<MyRental />)
+    }
+    //My Rentals Handler
     handleSnackOpen = (message) => {
         this.setState({ snackOpen: true, snackMessage: message })
     }
@@ -194,8 +199,6 @@ export default class Nav extends React.Component {
                             >
                                 <MenuItem onClick={this.handleCadastroUOpen}>Cadastre um Usuário</MenuItem>
                                 <MenuItem onClick={this.handleEdicaoUOpen}>Edite um Usuário</MenuItem>
-                                <MenuItem onClick={this.handleCadastroVOpen}>Cadastre um Veículo</MenuItem>
-                                <MenuItem onClick={this.handleEdicaoVOpen}>Edite um Veículo</MenuItem>
                             </Menu>
                         </div>)}
                     </Toolbar>
@@ -210,7 +213,14 @@ export default class Nav extends React.Component {
                         </Grid>
                     </Grid>
                 }
-                {value === 1 && <React.Fragment>Hellos</React.Fragment>}
+                {value === 1 &&
+                    <Grid container spacing={16} >
+                        <Grid item xs={12}>
+                            <Grid container spacing={16}>
+                                {this.sendMyRentals()}
+                            </Grid>
+                        </Grid>
+                    </Grid>}
                 {value === 2 && <React.Fragment>Hellos</React.Fragment>}
                 {/*TABS*/}
                 {!this.state.auth && <Login state={this.state}
@@ -220,14 +230,14 @@ export default class Nav extends React.Component {
                     handleLoginDialogClose={this.handleLoginDialogClose} />}
                 {/*LOGIN*/}
                 {this.state.rentalDialog && <Rental
-                    rentalDialog = {this.state.rentalDialog}
-                    handleRentalDialogClose = {this.handleRentalDialogClose}
-                    carId = {this.state.carId}
-                    carName = {this.state.carName}
+                    rentalDialog={this.state.rentalDialog}
+                    handleRentalDialogClose={this.handleRentalDialogClose}
+                    carId={this.state.carId}
+                    carName={this.state.carName}
                     dataCall={this.dataCall}
                     handleSnackOpen={this.handleSnackOpen}
                     handleSnackClose={this.handleSnackClose}
-                    userId = {this.state.userId}
+                    userId={this.state.userId}
                 />}
                 {/*RENTAL*/}
                 {this.state.cadastroUDialog && (
@@ -236,19 +246,19 @@ export default class Nav extends React.Component {
                         //states
                         handleCadastroUOpen={this.handleCadastroUOpen}
                         handleCadastroUClose={this.handleCadastroUClose}
-                        dataCall = {this.dataCall}
-                        handleSnackOpen = {this.handleSnackOpen}
-                        handleSnackClose = {this.handleSnackClose}
-                        //functions
+                        dataCall={this.dataCall}
+                        handleSnackOpen={this.handleSnackOpen}
+                        handleSnackClose={this.handleSnackClose}
+                    //functions
                     />
                 )}
                 {/* CADASTRO USUARIO */}
                 {this.state.edicaoUDialog && (
                     <EdicaoU
-                        edicaoUDialog = {this.state.edicaoUDialog}
+                        edicaoUDialog={this.state.edicaoUDialog}
                         dataCall={this.dataCall}
                         handleEdicaoUClose={this.handleEdicaoUClose}
-                        handleSnackOpen = {this.handleSnackOpen}
+                        handleSnackOpen={this.handleSnackOpen}
                     />
                 )}
                 {/* EDICAO USUARIO */}
