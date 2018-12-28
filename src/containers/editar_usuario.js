@@ -58,7 +58,7 @@ class EdicaoDialog extends React.Component {
     handleEdicaoNext = () => {
         let edicaoStep = this.state.edicaoStep
         if (edicaoStep === 0) {
-            let answer = this.props.dataCall('POST', 'http://localhost:90/validaUsuario', '{"email": "' + this.state.ediEmail + '"}')
+            let answer = this.props.dataCall('POST', 'http://localhost:90/searchUsuario', '{"email": "' + this.state.ediEmail + '"}')
             if (answer.length === 0) {
                 this.setState({ ediEmail: '' })
                 this.props.handleSnackOpen('Usuário não encontrado')
@@ -66,7 +66,11 @@ class EdicaoDialog extends React.Component {
             }
             else {
                 if (answer[0].fk_tipo_usuario_id === 1) this.setState({ ediAdminCheck: true })
-                this.setState({ ediNome: answer[0].nome_usuario, ediEmail: answer[0].email_usuario, ediRamal: answer[0].ramal_usuario, ediDepartamento: answer[0].fk_departamento_id, ediId: answer[0].id_usuario })
+                this.setState({ ediNome: answer[0].nome_usuario, 
+                                ediEmail: answer[0].email_usuario, 
+                                ediRamal: answer[0].ramal_usuario, 
+                                ediDepartamento: answer[0].fk_departamento_id, 
+                                ediId: answer[0].id_usuario })
             }
 
         }
@@ -80,11 +84,14 @@ class EdicaoDialog extends React.Component {
         edicao.nome = this.state.ediNome
         edicao.ramal = this.state.ediRamal
         edicao.email = this.state.ediEmail
-        edicao.departamento = this.state.ediDepartamento
+        edicao.depto = this.state.ediDepartamento
         edicao.id = this.state.ediId
-        edicao.admin = this.state.ediAdminCheck
-        JSON.stringify(edicao)
-        console.log(edicao)
+        edicao.tipoUsuario = this.state.ediAdminCheck ? '1' : '2'
+        console.log(edicao.tipoUsuario);
+        let response = this.props.dataCall('POST', 'http://localhost:90/editUsuario', JSON.stringify(edicao))
+        if(response.update.affectedRows === 1){
+            this.props.handleSnackOpen('Dados alterados com sucesso')
+        }
         this.props.handleEdicaoUClose()
     }
     handleEdicaoBack = () => {

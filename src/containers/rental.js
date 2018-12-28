@@ -297,6 +297,7 @@ class RentalDialog extends React.Component {
     }
     handleClickRental = () => {
         let termino = new Date(Date.parse(this.state.inicio) + this.state.duracao)
+        let inicio = this.state.inicio
         let dataT = termino.toLocaleDateString('en-US')
         let duracao = this.state.duracao / 3600000
         if (duracao === 0.5) duracao = '00:30:00'
@@ -306,13 +307,14 @@ class RentalDialog extends React.Component {
         else if (duracao === 6) duracao = '06:00:00'
         else if (duracao === 8) duracao = '08:00:00'
         else if (duracao === 12) duracao = '12:00:00'
-        
+        inicio.setHours(inicio.getHours() - inicio.getTimezoneOffset() / 60)
+        termino.setHours(termino.getHours() - termino.getTimezoneOffset() / 60)
         let rental = new Object()
         rental.duracao = duracao
         rental.dataI = this.state.dataI.toJSON()
         rental.dataT = dataT
-        rental.inicio = this.state.inicio.toJSON().slice(0, 19).replace('T', ' ')
-        rental.termino = termino.toJSON().slice(0, 19).replace('T', ' ')
+        rental.inicio = this.state.inicio.toISOString().slice(0, 19).replace('T', ' ')
+        rental.termino = termino.toISOString().slice(0, 19).replace('T', ' ')
         rental.userId = this.props.userId
         rental.veiId = this.props.carId
         rental.motivo = this.state.motivo
