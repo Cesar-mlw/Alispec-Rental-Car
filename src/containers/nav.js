@@ -9,6 +9,7 @@ import Car from './car'
 import CadastroU from './cadastro_usuario'
 import EdicaoU from './editar_usuario'
 import MyRental from './myRentals'
+import Charts from './charts'
 Cloudinary.config({
     cloud_name: '#Input with cloud name - present in todo.txt',
     api_key: '#Input with api_key - present in todo.txt',
@@ -44,6 +45,7 @@ export default class Nav extends React.Component {
         filterMenu: false,
         filter: 'Confirmado',
         rentals: null,
+        filterMenuAnchor: null,
         //state that controls stepper
         snackOpen: false,
         snackMessage: '',
@@ -67,15 +69,18 @@ export default class Nav extends React.Component {
     handleMenuClose = () => {
         this.setState({ menu: null })
     }
+    handleEmailChange
     //AppBar
     handleLoginDialogClose = () => {
         this.setState({ loginDialog: false })
     }
-    handleClickLogin = () => {
-        //make text fields better
-        let validate = this.dataCall('POST', 'http://localhost:90/validaUsuario', '{"email": "' + this.state.email + '"}')
+    handleClickLogin = (email , senha) => {
+        let data = new Object()
+        data.email = email
+        data.senha = senha
+        let validate = this.dataCall('POST', 'http://localhost:90/validaUsuario', JSON.stringify(data))
         if (validate.length === 0) {
-            alert("E-mail ou Id errados")
+            this.handleSnackOpen("E-mail Incorreto")
         }
         else {
             if (validate[0].fk_tipo_usuario_id === 1) this.setState({ loginDialog: false, userId: validate[0].id_usuario, admin: true, auth: true, snackOpen: true, snackMessage: 'Seja Bem vindo ' + validate[0].nome_usuario })
@@ -163,22 +168,23 @@ export default class Nav extends React.Component {
             let response = this.dataCall("POST", "http://localhost:90/getRentals", JSON.stringify(data))
             let components = []
             for (let i in response) {
-                components[i] = (<MyRental sendMyRentals={this.sendMyRentals} dataCall = {this.dataCall} key={i} id={response[i].id_locacao} car={response[i].nome_veiculo} inicio={response[i].inicio_locacao} termino={response[i].termino_locacao} motivo={response[i].motivo_locacao} motorista={response[i].motorista_locacao} status={response[i].nome_status} />)
+                components[i] = (<MyRental handleSnackOpen={this.handleSnackOpen} sendMyRentals={this.sendMyRentals} dataCall = {this.dataCall} key={i} id={response[i].id_locacao} car={response[i].nome_veiculo} inicio={response[i].inicio_locacao} termino={response[i].termino_locacao} motivo={response[i].motivo_locacao} motorista={response[i].motorista_locacao} status={response[i].nome_status} />)
             }
             return components
         }
         else{
             let components = []
             for (let i in this.state.rentals) {
-                components[i] = (<MyRental dataCall = {this.dataCall} sendMyRentals={this.sendMyRentals} key={i} id={this.state.rentals[i].id_locacao} car={this.state.rentals[i].nome_veiculo} inicio={this.state.rentals[i].inicio_locacao} termino={this.state.rentals[i].termino_locacao} motivo={this.state.rentals[i].motivo_locacao} motorista={this.state.rentals[i].motorista_locacao} status={this.state.rentals[i].nome_status} />)
+                components[i] = (<MyRental handleSnackOpen={this.handleSnackOpen} dataCall = {this.dataCall} sendMyRentals={this.sendMyRentals} key={i} id={this.state.rentals[i].id_locacao} car={this.state.rentals[i].nome_veiculo} inicio={this.state.rentals[i].inicio_locacao} termino={this.state.rentals[i].termino_locacao} motivo={this.state.rentals[i].motivo_locacao} motorista={this.state.rentals[i].motorista_locacao} status={this.state.rentals[i].nome_status} />)
             }
             return components
         }
     }
-    handleFilterMenuChange = () => {
+    handleFilterMenuChange = event => {
         let filterMenu = this.state.filterMenu
         this.setState({
             filterMenu: !filterMenu,
+            filterMenuAnchor: event.currentTarget,
         })
     }
     //My Rentals Handler
@@ -269,14 +275,14 @@ export default class Nav extends React.Component {
                     <div>
                         <div>
                             <div>
-                                <Menu open={this.state.filterMenu} onClose={this.handleFilterMenuChange}  >
+                                <Menu anchorEl={this.state.filterMenuAnchor} open={this.state.filterMenu} onClose={this.handleFilterMenuChange} id='filter-menu'>
                                     <MenuItem onClick={() => this.sendMyRentals("Confirmado")}>Confirmados</MenuItem>
                                     <MenuItem onClick={() => this.sendMyRentals("Cancelado")}>Cancelados</MenuItem>
                                     <MenuItem onClick={() => this.sendMyRentals("Terminado")}>Terminados</MenuItem>
                                     <MenuItem onClick={() => this.sendMyRentals("Todo")}>Todos</MenuItem>
                                 </Menu>
                             </div>
-                            <Button onClick={this.handleFilterMenuChange} style={{ marginTop: '4vh' }} variant='outlined'>
+                            <Button aria-owns='filter-menu' aria-haspopup='true' onClick={this.handleFilterMenuChange} style={{ marginTop: '4vh' }} variant='outlined'>
                                 Filtros
                             </Button>
                         </div>
@@ -285,7 +291,11 @@ export default class Nav extends React.Component {
                         </div>
                     </div>
                 )}
-                {value === 2 && <React.Fragment>Hellos</React.Fragment>}
+                {value === 2 && 
+                    <div>
+                        <Charts dataCall={this.dataCall} handleSnackOpen={this.handleSnackOpen}/>
+                    </div>
+                }
                 {/*TABS*/}
                 {!this.state.auth && <Login state={this.state}
                     handleClickLogin={this.handleClickLogin}

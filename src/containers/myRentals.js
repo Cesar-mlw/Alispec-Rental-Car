@@ -1,5 +1,5 @@
 import React from 'react'
-import { ExpansionPanel, withStyles, ExpansionPanelSummary, Typography, ExpansionPanelDetails, Divider, ExpansionPanelActions, Button, TextField, WithStyles } from '@material-ui/core';
+import { ExpansionPanel, withStyles, ExpansionPanelSummary, Typography, ExpansionPanelDetails, Divider, ExpansionPanelActions, Button, TextField } from '@material-ui/core';
 const styles = theme =>({
     div: {
         marginTop: '5vh',
@@ -37,8 +37,9 @@ class myRentals extends React.Component {
     cancelRental = () =>{
         let rental = new Object()
         rental.id = this.props.id
-        let response = this.props.dataCall("POST", "http://localhost:90/cancelRental", JSON.stringify(rental))
+        this.props.dataCall("POST", "http://localhost:90/cancelRental", JSON.stringify(rental))
         this.props.sendMyRentals("Confirmado")
+        this.props.handleSnackOpen("Aluguel cancelado com sucesso")
     }
     render() {
         const { classes } = this.props

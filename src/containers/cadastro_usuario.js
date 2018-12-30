@@ -33,6 +33,7 @@ class CadastroDialog extends React.Component {
         cadRamal: '',
         cadValue: 0,
         cadAdminCheck: false,
+        cadSenha: ''
     }
     handleCadastroNomeChange = (event) => {
         this.setState({ cadNome: event.target.value })
@@ -51,18 +52,32 @@ class CadastroDialog extends React.Component {
         else this.setState({ cadTipoUsuario: 2 })
         this.setState({ cadAdminCheck: event.target.checked })
     }
+    handleCadastroSenhaChange = (event) => {
+        this.setState({
+            cadSenha: event.target.value
+        })
+    }
     handleCadastroU = () => {
-        let check = this.props.dataCall('POST', 'http://localhost:90/validaUsuario', '{"email": "' + this.state.cadEmail + '"}')
+        let check = this.props.dataCall('POST', 'http://localhost:90/searchUsuario', '{"email": "' + this.state.cadEmail + '"}')
         if (check.length === 0) {
-            let response = JSON.parse(this.props.dataCall('POST', 'http://localhost:90/insertUsu', '{"usuario": "' + this.state.cadNome + '", "email": "' + this.state.cadEmail + '", "ramal": "' + this.state.cadRamal + '", "tipoUsuario": "' + this.state.cadTipoUsuario + '", "departamento": "' + this.state.cadDepartamento + '"}'))
-            if (response === 1) {
+            let user = new Object()
+            user.usuario = this.state.cadNome
+            user.email = this.state.cadEmail
+            user.ramal = this.state.cadRamal
+            user.tipoUsuario = this.state.cadTipoUsuario
+            user.departamento = this.state.cadDepartamento
+            user.senha = this.state.cadSenha
+            let response = this.props.dataCall('POST', 'http://localhost:90/insertUsu', JSON.stringify(user))
+            console.log(response);
+            if (response.length !== 0) {
                 this.setState({
                     cadActiveStep: 0,
                     cadNome: '',
                     cadEmail: '',
                     cadAdminCheck: false,
                     cadRamal: '',
-                    cadDepartamento: 0
+                    cadDepartamento: 0,
+                    cadSenha: ''
                 })
                 this.props.handleSnackOpen('Cadastro efetuado com sucesso')
                 this.props.handleCadastroUClose()
@@ -102,6 +117,16 @@ class CadastroDialog extends React.Component {
                             placeholder='manoel_bandeira@alispec.com.br'
                             value={this.state.cadEmail}
                             onChange={this.handleCadastroEmailChange}
+                            margin='normal'
+                            required
+                            style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
+                        />
+                        <TextField
+                            id='email_usuario'
+                            label='Senha do Usuário'
+                            placeholder='1234'
+                            value={this.state.cadSenha}
+                            onChange={this.handleCadastroSenhaChange}
                             margin='normal'
                             required
                             style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}
