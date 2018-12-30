@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Button, Dialog, DialogTitle, TextField, withStyles, Stepper, StepLabel, Step, Typography, InputLabel, Select, MenuItem } from '@material-ui/core';
 import { DatePicker, MuiPickersUtilsProvider } from 'material-ui-pickers';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils'
@@ -319,11 +319,6 @@ class RentalDialog extends React.Component {
         rental.veiId = this.props.carId
         rental.motivo = this.state.motivo
         rental.motorista = this.state.motorista
-        let debug = new Object()
-        debug.inicio = rental.inicio.toString()
-        debug.duracao = this.state.duracao
-        debug.termino = rental.termino.toString()
-        console.table(debug)
         let response = JSON.parse(this.props.dataCall('POST', 'http://localhost:90/insertRental', JSON.stringify(rental)))
         if (response === 1) {
             this.props.handleSnackOpen("Aluguel efetuado com sucesso")

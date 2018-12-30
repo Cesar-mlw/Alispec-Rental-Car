@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Toolbar, AppBar, Tabs, Tab, Grid, MenuItem, Snackbar, IconButton, Menu } from '@material-ui/core';
+import { Typography, Toolbar, AppBar, Tabs, Tab, Grid, MenuItem, Snackbar, IconButton, Menu, Button } from '@material-ui/core';
 import { DirectionsCar, Receipt, Close, AccountCircle, Storage } from '@material-ui/icons'
 import 'typeface-roboto'
 import Login from './login'
@@ -24,8 +24,10 @@ const styles = {
         paddingTop: '56.35%'
     },
     carCard: {
-
         flexDirection: 'row'
+    },
+    filterMenu: {
+        marginTop: '4vh'
     }
 }
 
@@ -34,12 +36,14 @@ export default class Nav extends React.Component {
         value: 0,
         //value to control top tabs
         auth: false,
-        email: '',
         userId: 1,
         admin: true, //CHANGE THIS TO FALSE BEFORE SHIPPING IT OUT
         menu: null,
         loginDialog: false, //CHANGE THIS TO TRUE BEFORE SHIPPING IT OUT
         activeStep: 0,
+        filterMenu: false,
+        filter: 'Confirmado',
+        rentals: null,
         //state that controls stepper
         snackOpen: false,
         snackMessage: '',
@@ -64,9 +68,6 @@ export default class Nav extends React.Component {
         this.setState({ menu: null })
     }
     //AppBar
-    handleEmailChange = (event) => {
-        this.setState({ email: event.target.value })
-    }
     handleLoginDialogClose = () => {
         this.setState({ loginDialog: false })
     }
@@ -102,10 +103,6 @@ export default class Nav extends React.Component {
         this.setState({ edicaoUDialog: false })
     }
     //Edicao Usuario
-    handleCadastroVOpen = () => {
-        console.log('Hello World');
-    }
-    //Cadastro Veiculo
     handleEdicaoVOpen = () => {
         //implement vehicle edition - difficulty expected -> update the car image on cloudinary
     }
@@ -123,11 +120,66 @@ export default class Nav extends React.Component {
                 image={Cloudinary.url(image)} /></Grid>)
         }
         return components
-
     }
     //Car Card Handler
-    sendMyRentals = () => {
-        return (<MyRental />)
+    sendMyRentals = (filter) => {
+        let response
+        if (filter === "Confirmado") {
+            let data = new Object()
+            data.status = 1
+            data.userId = this.state.userId
+            response = this.dataCall("POST", "http://localhost:90/getRentals", JSON.stringify(data))
+        }
+        else if (filter === "Cancelado") {
+            let data = new Object()
+            data.status = 2
+            data.userId = this.state.userId
+            response = this.dataCall("POST", "http://localhost:90/getRentals", JSON.stringify(data))
+        }
+        else if (filter === "Terminado") {
+            let data = new Object()
+            data.status = 3
+            data.userId = this.state.userId
+            response = this.dataCall("POST", "http://localhost:90/getRentals", JSON.stringify(data))
+        }
+        else {
+            let data = new Object()
+            data.userId = this.state.userId
+            response = this.dataCall("POST", "http://localhost:90/allRentals", JSON.stringify(data))
+        }
+        console.log(response);
+        this.setState({
+            rentals: response,
+            filter: filter,
+            filterMenu: false
+        })
+        
+    }
+    buildComponents = () => {
+        if(this.state.rentals === null){
+            let data = new Object()
+            data.status = 1
+            data.userId = this.state.userId
+            let response = this.dataCall("POST", "http://localhost:90/getRentals", JSON.stringify(data))
+            let components = []
+            for (let i in response) {
+                components[i] = (<MyRental sendMyRentals={this.sendMyRentals} dataCall = {this.dataCall} key={i} id={response[i].id_locacao} car={response[i].nome_veiculo} inicio={response[i].inicio_locacao} termino={response[i].termino_locacao} motivo={response[i].motivo_locacao} motorista={response[i].motorista_locacao} status={response[i].nome_status} />)
+            }
+            return components
+        }
+        else{
+            let components = []
+            for (let i in this.state.rentals) {
+                components[i] = (<MyRental dataCall = {this.dataCall} sendMyRentals={this.sendMyRentals} key={i} id={this.state.rentals[i].id_locacao} car={this.state.rentals[i].nome_veiculo} inicio={this.state.rentals[i].inicio_locacao} termino={this.state.rentals[i].termino_locacao} motivo={this.state.rentals[i].motivo_locacao} motorista={this.state.rentals[i].motorista_locacao} status={this.state.rentals[i].nome_status} />)
+            }
+            return components
+        }
+    }
+    handleFilterMenuChange = () => {
+        let filterMenu = this.state.filterMenu
+        this.setState({
+            filterMenu: !filterMenu,
+        })
     }
     //My Rentals Handler
     handleSnackOpen = (message) => {
@@ -213,20 +265,30 @@ export default class Nav extends React.Component {
                         </Grid>
                     </Grid>
                 }
-                {value === 1 &&
-                    <Grid container spacing={16} >
-                        <Grid item xs={12}>
-                            <Grid container spacing={16}>
-                                {this.sendMyRentals()}
-                            </Grid>
-                        </Grid>
-                    </Grid>}
+                {value === 1 && (
+                    <div>
+                        <div>
+                            <div>
+                                <Menu open={this.state.filterMenu} onClose={this.handleFilterMenuChange}  >
+                                    <MenuItem onClick={() => this.sendMyRentals("Confirmado")}>Confirmados</MenuItem>
+                                    <MenuItem onClick={() => this.sendMyRentals("Cancelado")}>Cancelados</MenuItem>
+                                    <MenuItem onClick={() => this.sendMyRentals("Terminado")}>Terminados</MenuItem>
+                                    <MenuItem onClick={() => this.sendMyRentals("Todo")}>Todos</MenuItem>
+                                </Menu>
+                            </div>
+                            <Button onClick={this.handleFilterMenuChange} style={{ marginTop: '4vh' }} variant='outlined'>
+                                Filtros
+                            </Button>
+                        </div>
+                        <div>
+                            {this.buildComponents()}
+                        </div>
+                    </div>
+                )}
                 {value === 2 && <React.Fragment>Hellos</React.Fragment>}
                 {/*TABS*/}
                 {!this.state.auth && <Login state={this.state}
-                    handleClickCadastro={this.handleClickCadastro}
                     handleClickLogin={this.handleClickLogin}
-                    handleEmailChange={this.handleEmailChange}
                     handleLoginDialogClose={this.handleLoginDialogClose} />}
                 {/*LOGIN*/}
                 {this.state.rentalDialog && <Rental
@@ -279,7 +341,6 @@ export default class Nav extends React.Component {
                         </IconButton>
                     ]}
                 />
-
             </div>
         )
     }
