@@ -74,13 +74,13 @@ export default class Nav extends React.Component {
     handleLoginDialogClose = () => {
         this.setState({ loginDialog: false })
     }
-    handleClickLogin = (email , senha) => {
+    handleClickLogin = (nome , senha) => {
         let data = new Object()
-        data.email = email
+        data.nome = String(nome).toLocaleUpperCase
         data.senha = senha
         let validate = this.dataCall('POST', 'http://localhost:90/validaUsuario', JSON.stringify(data))
         if (validate.length === 0) {
-            this.handleSnackOpen("E-mail Incorreto")
+            this.handleSnackOpen("Nome e/ou RG incorreto(s)")
         }
         else {
             if (validate[0].fk_tipo_usuario_id === 1) this.setState({ loginDialog: false, userId: validate[0].id_usuario, admin: true, auth: true, snackOpen: true, snackMessage: 'Seja Bem vindo ' + validate[0].nome_usuario })

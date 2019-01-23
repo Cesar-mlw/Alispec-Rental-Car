@@ -53,14 +53,13 @@ class EdicaoDialog extends React.Component {
     handleEdicaoAdminChange = (event) => {
         if (event.target.checked) this.setState({ ediTipoUsuario: 1 })
         else this.setState({ ediTipoUsuario: 2 })
-        this.setState({ ediAdminCheck: event.target.checked })
     }
     handleEdicaoNext = () => {
         let edicaoStep = this.state.edicaoStep
         if (edicaoStep === 0) {
-            let answer = this.props.dataCall('POST', 'http://localhost:90/searchUsuario', '{"email": "' + this.state.ediEmail + '"}')
+            let answer = this.props.dataCall('POST', 'http://localhost:90/searchUsuario', '{"nome": "' + this.state.ediNome + '"}')
             if (answer.length === 0) {
-                this.setState({ ediEmail: '' })
+                this.setState({ ediNome: '' })
                 this.props.handleSnackOpen('Usuário não encontrado')
                 return
             }
@@ -106,10 +105,10 @@ class EdicaoDialog extends React.Component {
                         <Typography style={{ marginLeft: '4%', marginBottom: '4%', width: '90%' }} align={'center'} variant={'title'} color={'inherit'}>E-mail</Typography>
                         <TextField
                             id='email_edi'
-                            label='E-mail do usuário'
-                            placeholder='mario_quintana@alispec.com.br'
-                            value={this.state.ediEmail}
-                            onChange={this.handleEdicaoEmailChange}
+                            label='Nome do usuário'
+                            placeholder='Mario Quintana'
+                            value={this.state.ediNome}
+                            onChange={this.handleEdicaoNomeChange}
                             margin='normal'
                             required
                             style={{ marginLeft: '4%', marginBottom: '2%', width: '90%' }}

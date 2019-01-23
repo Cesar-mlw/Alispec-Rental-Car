@@ -44,8 +44,8 @@ class LoginDialog extends React.Component {
                         <TextField
                             required
                             id='usuario'
-                            label='E-mail Corporativo'
-                            placeholder='fernando_pessoa@alispec.com.br'
+                            label='Nome Completo'
+                            placeholder='Fernando Pessoa'
                             type='text'
                             className={styles.textField}
                             fullWidth
@@ -55,7 +55,7 @@ class LoginDialog extends React.Component {
                         <TextField
                             required
                             id='senha'
-                            label='Senha'
+                            label='RG (somente os números)'
                             placeholder='1234'
                             type='text'
                             className={styles.textField}
@@ -65,7 +65,7 @@ class LoginDialog extends React.Component {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => this.props.handleClickLogin(this.state.email, this.state.senha)} color='primary'>Entrar</Button>
+                        <Button onClick={() => this.props.handleClickLogin(this.state.nome, this.state.senha)} color='primary'>Entrar</Button>
                     </DialogActions>
                 </Dialog>
             </div>
